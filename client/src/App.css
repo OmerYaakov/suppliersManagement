@@ -1,4 +1,9 @@
 /* Global styles */
+html {
+  direction: rtl;
+  unicode-bidi: embed;
+}
+
 body {
   font-family: "Roboto", sans-serif;
   background-color: #f4f6f8;
