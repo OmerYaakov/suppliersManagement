@@ -1,18 +1,15 @@
 import React, { useState } from "react";
 import { TextField, Button, MenuItem, Select, InputLabel, FormControl, Box } from "@mui/material";
+import axios from "axios";
 
 const Transaction = () => {
   const [suppliers, setSuppliers] = useState(["omer", "yosi", "roi"]);
-  const [transactionTypes, setTransactionTypes] = useState([
-    "Invoice",
-    "Receipt",
-    "Invoice-Receipt",
-  ]);
-  const [recivers, setRecivers] = useState(["Chen", "Gabby", "Davidi"]);
+  const [transactionTypes, setTransactionTypes] = useState(["חשבונית", "קבלה", "חשבונית-קבלה"]);
+  const [recivers, setRecivers] = useState(["גבי", "חן", "דוידי"]);
   const [transactionCategories, setTransactionCategories] = useState([
-    "Buying-purchase",
-    "General-maintenance",
-    "Payment by check",
+    "קניית סחורה",
+    "תחזוקה כללית",
+    "תשלום צ'ק שאגל",
   ]);
 
   const [selectedSupplier, setSelectedSupplier] = useState("");
@@ -40,6 +37,7 @@ const Transaction = () => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
+
     console.log({
       selectedSupplier,
       selectedTransactionType,
@@ -54,50 +52,50 @@ const Transaction = () => {
 
   return (
     <Box sx={{ maxWidth: 600, margin: "0 auto", padding: 3 }}>
-      <h1>Add New Transaction</h1>
+      <h1>הוספת עסקה חדשה</h1>
       <form onSubmit={handleFormSubmit}>
         <FormControl fullWidth margin="normal">
-          <InputLabel>Supplier</InputLabel>
+          <InputLabel>ספק</InputLabel>
           <Select
             value={selectedSupplier}
             onChange={handleInputChange(setSelectedSupplier)}
             label="Supplier"
             required>
             <MenuItem value="" disabled>
-              Select a supplier
+              בחר ספק
             </MenuItem>
             {suppliers.map((supplier, index) => (
               <MenuItem key={index} value={supplier}>
                 {supplier}
               </MenuItem>
             ))}
-            <MenuItem value="add">Add new supplier</MenuItem>
+            <MenuItem value="add">הוסף ספק חדש</MenuItem>
           </Select>
         </FormControl>
         {selectedSupplier === "add" && (
           <div>
             <TextField
-              label="New Supplier Name"
+              label="שם הספק"
               value={newSupplier}
               onChange={handleInputChange(setNewSupplier)}
               fullWidth
               margin="normal"
             />
             <Button variant="contained" onClick={handleAddSupplier}>
-              Add
+              הוסף
             </Button>
           </div>
         )}
 
         <FormControl fullWidth margin="normal">
-          <InputLabel>Transaction Type</InputLabel>
+          <InputLabel>סוג העסקה</InputLabel>
           <Select
             value={selectedTransactionType}
             onChange={handleInputChange(setSelectedTransactionType)}
             label="Transaction Type"
             required>
             <MenuItem value="" disabled>
-              Select Transaction Type
+              בחר סוג עסקה
             </MenuItem>
             {transactionTypes.map((type, index) => (
               <MenuItem key={index} value={type}>
@@ -108,7 +106,7 @@ const Transaction = () => {
         </FormControl>
 
         <TextField
-          label="Transaction Number"
+          label="מספר עסקה"
           value={transactionNumber}
           onChange={handleInputChange(setTransactionNumber)}
           fullWidth
@@ -118,7 +116,7 @@ const Transaction = () => {
         />
 
         <TextField
-          label="Transaction Amount (NIS)"
+          label="סכום העסקה בשקלים"
           value={transactionAmount}
           onChange={handleInputChange(setTransactionAmount)}
           fullWidth
@@ -128,7 +126,7 @@ const Transaction = () => {
         />
 
         <TextField
-          label="Transaction Date"
+          label="תאריך העסקה"
           value={transactionDate}
           onChange={handleInputChange(setTransactionDate)}
           fullWidth
@@ -141,14 +139,14 @@ const Transaction = () => {
         />
 
         <FormControl fullWidth margin="normal">
-          <InputLabel>Receives the Transaction</InputLabel>
+          <InputLabel>מקבל העסקה</InputLabel>
           <Select
             value={selectedReciver}
             onChange={handleInputChange(setSelectedReciver)}
-            label="Receives the Transaction"
+            label="מקבל העסקה"
             required>
             <MenuItem value="" disabled>
-              Select Receiver
+              בחר מקבל
             </MenuItem>
             {recivers.map((reciver, index) => (
               <MenuItem key={index} value={reciver}>
@@ -159,14 +157,14 @@ const Transaction = () => {
         </FormControl>
 
         <FormControl fullWidth margin="normal">
-          <InputLabel>Transaction Category</InputLabel>
+          <InputLabel>קטגוריה</InputLabel>
           <Select
             value={selectedTransactionCategory}
             onChange={handleInputChange(setSelectedTransactionCategory)}
-            label="Transaction Category"
+            label="קטגוריה"
             required>
             <MenuItem value="" disabled>
-              Select Category
+              בחר קטגוריה
             </MenuItem>
             {transactionCategories.map((category, index) => (
               <MenuItem key={index} value={category}>
@@ -177,16 +175,16 @@ const Transaction = () => {
         </FormControl>
 
         <TextField
-          label="Notes"
+          label="הערות"
           value={notes}
           onChange={handleInputChange(setNotes)}
           fullWidth
           margin="normal"
-          placeholder="Add your notes here"
+          placeholder="הערות"
         />
 
         <Button variant="contained" type="submit" fullWidth>
-          Submit
+          אישור
         </Button>
       </form>
     </Box>
