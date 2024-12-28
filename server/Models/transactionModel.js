@@ -21,7 +21,7 @@ const transactionSchema = mongoose.Schema({
     required: true,
   },
 
-  date: {
+  transactionDate: {
     type: String,
     required: true,
   },
@@ -31,7 +31,7 @@ const transactionSchema = mongoose.Schema({
     required: true,
   },
 
-  category: {
+  transactionCategory: {
     type: String,
     required: true,
   },
