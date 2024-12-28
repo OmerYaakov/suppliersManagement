@@ -1,3 +1,4 @@
+import { errorMessages } from "vue/compiler-sfc";
 import trasactionModel from "../Models/transactionModel.js";
 
 const createTransaction = async (req, res) => {
@@ -7,9 +8,9 @@ const createTransaction = async (req, res) => {
     transactionType,
     transactionNumber,
     transactionAmount,
-    date,
+    transactionDate,
     recivesTransaction,
-    category,
+    transactionCategory,
     notes,
   } = req.body;
   try {
@@ -19,21 +20,22 @@ const createTransaction = async (req, res) => {
     if (exsitingTransaction) {
       return res.status(409).json({ message: "transaction with this number is already exists" });
     }
-    const newTransaction = new trasactionModel({
+
+    const newTransaction = await trasactionModel.create({
       supplierName,
       transactionType,
       transactionNumber,
       transactionAmount,
-      date,
+      transactionDate,
       recivesTransaction,
-      category,
+      transactionCategory,
       notes,
     });
 
-    console.log("new transaction ----" + { newTransaction });
-    await newTransaction.save();
+    console.log("New transaction created: ", newTransaction);
     res.status(201).json(newTransaction);
-  } catch {
+  } catch (error) {
+    console.error("Error creating transaction: ", error.message);
     res.status(500).json({ message: error.message });
   }
 };

@@ -28,5 +28,10 @@ const supplierSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
+
+  notes: {
+    type: String,
+  },
 });
 const Supplier = mongoose.model("Supplier", supplierSchema);
+export default Supplier;
