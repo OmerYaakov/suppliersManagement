@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextField, Button, MenuItem, Select, InputLabel, FormControl, Box } from "@mui/material";
 import axios from "axios";
 
 const Transaction = () => {
-  const [suppliers, setSuppliers] = useState(["omer", "yosi", "roi"]);
+  const [suppliers, setSuppliers] = useState([]);
   const [transactionTypes, setTransactionTypes] = useState(["חשבונית", "קבלה", "חשבונית-קבלה"]);
-  const [recivers, setRecivers] = useState(["גבי", "חן", "דוידי"]);
+  const [reciversTransaction, setRecivers] = useState(["גבי", "חן", "דוידי"]);
   const [transactionCategories, setTransactionCategories] = useState([
     "קניית סחורה",
     "תחזוקה כללית",
@@ -17,43 +17,80 @@ const Transaction = () => {
   const [selectedReciver, setSelectedReciver] = useState("");
   const [selectedTransactionCategory, setSelectedTransactionCategory] = useState("");
 
-  const [isAddingSupplier, setIsAddingSupplier] = useState(false);
   const [newSupplier, setNewSupplier] = useState("");
   const [transactionNumber, setTransactionNumber] = useState("");
   const [transactionAmount, setTransactionAmount] = useState("");
   const [transactionDate, setTransactionDate] = useState("");
   const [notes, setNotes] = useState("");
 
-  const handleInputChange = (setter) => (event) => setter(event.target.value);
+  useEffect(() => {
+    fetchSuppliers();
+  }, []);
 
-  const handleAddSupplier = () => {
-    if (newSupplier.trim()) {
-      setSuppliers((prevSuppliers) => [...prevSuppliers, newSupplier]);
-      setSelectedSupplier(newSupplier);
-      setNewSupplier("");
-      setIsAddingSupplier(false);
+  const fetchSuppliers = async () => {
+    try {
+      const res = await axios.get("/supplier/get");
+      if (Array.isArray(res.data)) {
+        setSuppliers(res.data);
+        console.log("Fetched suppliers:", res.data);
+      } else {
+        console.error("Unexpected response format:", res.data);
+        setSuppliers([]);
+      }
+    } catch (error) {
+      console.error("Error fetching suppliers:", error);
+      setSuppliers([]);
     }
   };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
+  const handleInputChange = (setter) => (event) => setter(event.target.value);
 
-    console.log({
-      selectedSupplier,
-      selectedTransactionType,
-      transactionNumber,
-      transactionAmount,
-      transactionDate,
-      selectedReciver,
-      selectedTransactionCategory,
-      notes,
-    });
+  // const handleAddSupplier = () => {
+  //   if (newSupplier.trim()) {
+  //     setSuppliers((prevSuppliers) => [...prevSuppliers, newSupplier]);
+  //     setSelectedSupplier(newSupplier);
+  //     setNewSupplier("");
+  //   }
+  // };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const newTransaction = {
+        supplierName: selectedSupplier,
+        transactionType: selectedTransactionType,
+        transactionNumber,
+        transactionAmount,
+        transactionDate,
+        recivesTransaction: selectedReciver,
+        transactionCategory: selectedTransactionCategory,
+        notes,
+      };
+
+      console.log("Creating transaction...", newTransaction);
+
+      const res = await axios.post("/transaction/create", newTransaction);
+      console.log("Transaction created successfully:", res.data);
+      setSelectedSupplier("");
+      setSelectedTransactionType("");
+      setTransactionNumber("");
+      setTransactionAmount("");
+      setTransactionDate("");
+      setSelectedReciver("");
+      setSelectedTransactionCategory("");
+      setNotes("");
+    } catch (error) {
+      if (error.response?.status === 409) {
+        alert("קיימת עסקה עם אותו מספר.");
+      }
+      console.error("Error creating transaction: ", error.response?.data || error.message);
+    }
   };
 
   return (
     <Box sx={{ maxWidth: 600, margin: "0 auto", padding: 3 }}>
       <h1>הוספת עסקה חדשה</h1>
-      <form onSubmit={handleFormSubmit}>
+      <form onSubmit={handleSubmit}>
         <FormControl fullWidth margin="normal">
           <InputLabel>ספק</InputLabel>
           <Select
@@ -61,31 +98,13 @@ const Transaction = () => {
             onChange={handleInputChange(setSelectedSupplier)}
             label="Supplier"
             required>
-            <MenuItem value="" disabled>
-              בחר ספק
-            </MenuItem>
             {suppliers.map((supplier, index) => (
-              <MenuItem key={index} value={supplier}>
-                {supplier}
+              <MenuItem key={index} value={supplier.supplierName}>
+                {supplier.supplierName}
               </MenuItem>
             ))}
-            <MenuItem value="add">הוסף ספק חדש</MenuItem>
           </Select>
         </FormControl>
-        {selectedSupplier === "add" && (
-          <div>
-            <TextField
-              label="שם הספק"
-              value={newSupplier}
-              onChange={handleInputChange(setNewSupplier)}
-              fullWidth
-              margin="normal"
-            />
-            <Button variant="contained" onClick={handleAddSupplier}>
-              הוסף
-            </Button>
-          </div>
-        )}
 
         <FormControl fullWidth margin="normal">
           <InputLabel>סוג העסקה</InputLabel>
@@ -148,7 +167,7 @@ const Transaction = () => {
             <MenuItem value="" disabled>
               בחר מקבל
             </MenuItem>
-            {recivers.map((reciver, index) => (
+            {reciversTransaction.map((reciver, index) => (
               <MenuItem key={index} value={reciver}>
                 {reciver}
               </MenuItem>

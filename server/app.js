@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cors from "cors";
 import transactionRoute from "./Routes/transactionRoute.js";
-// import supplierRoute from "./Routes/supplierRoute.js";
+import supplierRoute from "./Routes/supplierRoute.js";
 
 dotenv.config();
 const app = express();
@@ -26,6 +26,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use("/transaction", transactionRoute);
-// app.use("/supplier", supplierRoute);
+app.use("/supplier", supplierRoute);
 
 export default app;
