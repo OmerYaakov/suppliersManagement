@@ -1,11 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Button, MenuItem, Select, InputLabel, FormControl, Box } from "@mui/material";
+import {
+  TextField,
+  Button,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  ListItemText,
+  ListItemIcon,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 
 const Transaction = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [transactionTypes, setTransactionTypes] = useState(["חשבונית", "קבלה", "חשבונית-קבלה"]);
-  const [reciversTransaction, setRecivers] = useState(["גבי", "חן", "דוידי"]);
+  const [receiversTransaction, setReceivers] = useState([]);
   const [transactionCategories, setTransactionCategories] = useState([
     "קניית סחורה",
     "תחזוקה כללית",
@@ -14,7 +30,7 @@ const Transaction = () => {
 
   const [selectedSupplier, setSelectedSupplier] = useState("");
   const [selectedTransactionType, setSelectedTransactionType] = useState("");
-  const [selectedReciver, setSelectedReciver] = useState("");
+  const [selectedReceiver, setSelectedReceiver] = useState("");
   const [selectedTransactionCategory, setSelectedTransactionCategory] = useState("");
 
   const [newSupplier, setNewSupplier] = useState("");
@@ -23,8 +39,12 @@ const Transaction = () => {
   const [transactionDate, setTransactionDate] = useState("");
   const [notes, setNotes] = useState("");
 
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newReceiver, setNewReceiver] = useState("");
+
   useEffect(() => {
     fetchSuppliers();
+    fetchReceivers();
   }, []);
 
   const fetchSuppliers = async () => {
@@ -32,7 +52,6 @@ const Transaction = () => {
       const res = await axios.get("/supplier/get");
       if (Array.isArray(res.data)) {
         setSuppliers(res.data);
-        console.log("Fetched suppliers:", res.data);
       } else {
         console.error("Unexpected response format:", res.data);
         setSuppliers([]);
@@ -43,15 +62,59 @@ const Transaction = () => {
     }
   };
 
+  const fetchReceivers = async () => {
+    try {
+      const res = await axios.get("/receivers/get");
+      if (Array.isArray(res.data)) {
+        setReceivers(res.data);
+      } else {
+        console.error("Unexpected response format:", res.data);
+        setReceivers([]);
+      }
+    } catch (error) {
+      console.error("Error fetching receivers:", error);
+      setReceivers([]);
+    }
+  };
+
   const handleInputChange = (setter) => (event) => setter(event.target.value);
 
-  // const handleAddSupplier = () => {
-  //   if (newSupplier.trim()) {
-  //     setSuppliers((prevSuppliers) => [...prevSuppliers, newSupplier]);
-  //     setSelectedSupplier(newSupplier);
-  //     setNewSupplier("");
-  //   }
-  // };
+  const handleAddReceiver = async () => {
+    try {
+      const res = await axios.post("/receivers/create", { receiverName: newReceiver });
+      console.log("New receiver added:", res.data);
+
+      // Update the receiver list with the new receiver
+      setReceivers((prev) => [...prev, res.data]);
+      setSelectedReceiver(newReceiver); // Set the new receiver as the selected value
+      setNewReceiver(""); // Clear the input
+      setOpenDialog(false); // Close the dialog
+    } catch (error) {
+      console.error("Error adding new receiver:", error);
+    }
+  };
+
+  const handleRemoveReceiver = async (receiverId) => {
+    try {
+      await axios.delete(`/receivers/delete/${receiverId}`);
+      console.log("Receiver removed:", receiverId);
+
+      // Remove the receiver from the list
+      setReceivers((prev) => prev.filter((receiver) => receiver._id !== receiverId));
+
+      // Clear the selected receiver if it was the one removed
+      if (selectedReceiver === receiverId) {
+        setSelectedReceiver("");
+      }
+    } catch (error) {
+      console.error("Error removing receiver:", error);
+    }
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+    setNewReceiver("");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,7 +125,7 @@ const Transaction = () => {
         transactionNumber,
         transactionAmount,
         transactionDate,
-        recivesTransaction: selectedReciver,
+        receivesTransaction: selectedReceiver,
         transactionCategory: selectedTransactionCategory,
         notes,
       };
@@ -76,7 +139,7 @@ const Transaction = () => {
       setTransactionNumber("");
       setTransactionAmount("");
       setTransactionDate("");
-      setSelectedReciver("");
+      setSelectedReceiver("");
       setSelectedTransactionCategory("");
       setNotes("");
     } catch (error) {
@@ -98,6 +161,9 @@ const Transaction = () => {
             onChange={handleInputChange(setSelectedSupplier)}
             label="Supplier"
             required>
+            <MenuItem value="" disabled>
+              בחר ספק
+            </MenuItem>
             {suppliers.map((supplier, index) => (
               <MenuItem key={index} value={supplier.supplierName}>
                 {supplier.supplierName}
@@ -160,20 +226,58 @@ const Transaction = () => {
         <FormControl fullWidth margin="normal">
           <InputLabel>מקבל העסקה</InputLabel>
           <Select
-            value={selectedReciver}
-            onChange={handleInputChange(setSelectedReciver)}
+            value={selectedReceiver}
+            onChange={(event) => {
+              if (event.target.value === "add-new") {
+                setOpenDialog(true);
+              } else {
+                setSelectedReceiver(event.target.value);
+              }
+            }}
             label="מקבל העסקה"
             required>
             <MenuItem value="" disabled>
-              בחר מקבל
+              בחר מקבל העסקה
             </MenuItem>
-            {reciversTransaction.map((reciver, index) => (
-              <MenuItem key={index} value={reciver}>
-                {reciver}
+            {receiversTransaction.map((receiver) => (
+              <MenuItem key={receiver._id} value={receiver.receiverName}>
+                <ListItemIcon>
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveReceiver(receiver._id);
+                    }}
+                    size="small">
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </ListItemIcon>
+                <ListItemText primary={receiver.receiverName} />
               </MenuItem>
             ))}
+            <MenuItem value="add-new"> הוסף מקבל חדש</MenuItem>
           </Select>
         </FormControl>
+
+        <Dialog open={openDialog} onClose={handleDialogClose}>
+          <DialogTitle>הוסף מקבל חדש</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="שם המקבל"
+              type="text"
+              fullWidth
+              value={newReceiver}
+              onChange={(e) => setNewReceiver(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDialogClose}>ביטול</Button>
+            <Button onClick={handleAddReceiver} variant="contained">
+              הוסף
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <FormControl fullWidth margin="normal">
           <InputLabel>קטגוריה</InputLabel>
