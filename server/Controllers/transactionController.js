@@ -9,7 +9,7 @@ const createTransaction = async (req, res) => {
     transactionNumber,
     transactionAmount,
     transactionDate,
-    recivesTransaction,
+    receivesTransaction,
     transactionCategory,
     notes,
   } = req.body;
@@ -27,7 +27,7 @@ const createTransaction = async (req, res) => {
       transactionNumber,
       transactionAmount,
       transactionDate,
-      recivesTransaction,
+      receivesTransaction,
       transactionCategory,
       notes,
     });
