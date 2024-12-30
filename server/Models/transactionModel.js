@@ -26,7 +26,7 @@ const transactionSchema = mongoose.Schema({
     required: true,
   },
 
-  recivesTransaction: {
+  receivesTransaction: {
     type: String,
     required: true,
   },
