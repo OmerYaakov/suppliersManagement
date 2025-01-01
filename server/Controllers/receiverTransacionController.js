@@ -1,16 +1,16 @@
-import ReceiverTransaction from "../Models/receiverTransactionModel.js";
+import ReceiverTransactionModel from "../Models/receiverTransactionModel.js";
 
 const createReceiver = async (req, res) => {
   console.log("creating receiver...");
   const { receiverName } = req.body;
   try {
-    const exsitingReceiver = await ReceiverTransaction.findOne({
+    const exsitingReceiver = await ReceiverTransactionModel.findOne({
       receiverName: receiverName,
     });
     if (exsitingReceiver) {
       return res.status(409).json({ message: "receiver with this name is already exist" });
     }
-    const newReceiver = await ReceiverTransaction.create({
+    const newReceiver = await ReceiverTransactionModel.create({
       receiverName,
     });
 
@@ -24,11 +24,11 @@ const createReceiver = async (req, res) => {
 const getByName = async (req, res) => {
   const { receiverName } = req.query;
   try {
-    if (!name) {
+    if (!receiverName) {
       return res.status(400).json({ massege: "Name parameter is required!" });
     }
 
-    const data = await ReceiverTransaction.find({ receiverName: receiverName });
+    const data = await ReceiverTransactionModel.find({ receiverName: receiverName });
     if (data.lengh === 0) {
       return res.status(400).json({ message: "No data found for the provided name" });
     }
@@ -42,7 +42,7 @@ const getByName = async (req, res) => {
 const getAllReceivers = async (req, res) => {
   try {
     console.log("getting all receivers");
-    const receivers = await ReceiverTransaction.find();
+    const receivers = await ReceiverTransactionModel.find();
     res.status(200).json(receivers);
   } catch (error) {
     res.status(404).json({ message: error.massege });
@@ -53,7 +53,7 @@ const deleteReceiver = async (req, res) => {
   try {
     const receiverId = req.params.id;
 
-    const deletedReceiver = await ReceiverTransaction.findByIdAndDelete(receiverId);
+    const deletedReceiver = await ReceiverTransactionModel.findByIdAndDelete(receiverId);
 
     if (!deletedReceiver) {
       return res.status(404).json({ message: "Receiver not found" });
