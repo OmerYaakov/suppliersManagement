@@ -6,6 +6,7 @@ import cors from "cors";
 import transactionRoute from "./Routes/transactionRoute.js";
 import supplierRoute from "./Routes/supplierRoute.js";
 import receiversRout from "./Routes/receiverTransactionRoute.js";
+import transactionCategoryRoute from "./Routes/transactionCategoryRoute.js";
 
 dotenv.config();
 const app = express();
@@ -29,4 +30,5 @@ app.use(cors());
 app.use("/transaction", transactionRoute);
 app.use("/supplier", supplierRoute);
 app.use("/receivers", receiversRout);
+app.use("/transactionCategory", transactionCategoryRoute);
 export default app;

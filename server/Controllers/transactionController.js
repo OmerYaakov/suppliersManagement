@@ -32,7 +32,6 @@ const createTransaction = async (req, res) => {
       notes,
     });
 
-    console.log("New transaction created: ", newTransaction);
     res.status(201).json(newTransaction);
   } catch (error) {
     console.error("Error creating transaction: ", error.message);
