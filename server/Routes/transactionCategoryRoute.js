@@ -9,6 +9,6 @@ router.get("/getByCategory", transactionCategoryController.getByCategory);
 
 router.post("/create", transactionCategoryController.createCategory);
 
-router.delete("/delete", transactionCategoryController.deleteCategory);
+router.delete("/delete/:id", transactionCategoryController.deleteCategory);
 
 export default router;
