@@ -125,6 +125,7 @@ const Transaction = () => {
       };
 
       const res = await axios.post("/transaction/create", newTransaction);
+
       console.log("Transaction created successfully:", res.data);
 
       // Reset form
@@ -479,7 +480,7 @@ const Transaction = () => {
           fullWidth
           margin="normal"
           multiline
-          rows={4}
+          rows={2}
         />
 
         <Button type="submit" variant="contained" fullWidth>
