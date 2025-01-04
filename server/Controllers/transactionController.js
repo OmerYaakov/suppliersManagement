@@ -9,7 +9,7 @@ const createTransaction = async (req, res) => {
     transactionNumber,
     transactionAmount,
     transactionDate,
-    recivesTransaction,
+    receivesTransaction,
     transactionCategory,
     notes,
   } = req.body;
@@ -27,12 +27,11 @@ const createTransaction = async (req, res) => {
       transactionNumber,
       transactionAmount,
       transactionDate,
-      recivesTransaction,
+      receivesTransaction,
       transactionCategory,
       notes,
     });
 
-    console.log("New transaction created: ", newTransaction);
     res.status(201).json(newTransaction);
   } catch (error) {
     console.error("Error creating transaction: ", error.message);

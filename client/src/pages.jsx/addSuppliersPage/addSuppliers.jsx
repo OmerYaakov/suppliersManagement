@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { TextField, Button, MenuItem, Select, InputLabel, FormControl, Box } from "@mui/material";
 import axios from "axios";
 
-const supplier = () => {
+const addSupplier = () => {
   const [supplierName, setSupplierName] = useState("");
   const [addres, setAddres] = useState("");
   const [phone, setPhone] = useState("");
@@ -111,4 +111,4 @@ const supplier = () => {
   );
 };
 
-export default supplier;
+export default addSupplier;
