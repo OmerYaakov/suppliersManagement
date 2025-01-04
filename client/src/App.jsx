@@ -1,6 +1,7 @@
 import "./App.css";
 import Transaction from "./pages.jsx/transactionPage/transaction";
 import Supplier from "./pages.jsx/addSuppliersPage/addSuppliers";
+import SupplierLedger from "./pages.jsx/supplierLedgerPage/supplierLedger";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 axios.defaults.baseURL = "http://localhost:5000/";
@@ -14,6 +15,7 @@ function App() {
         <Routes>
           <Route path="/transaction" element={<Transaction />} />
           <Route path="/supplier" element={<Supplier />} />
+          <Route path="/supplierLedger" element={<SupplierLedger />} />
         </Routes>
       </BrowserRouter>
     </>
