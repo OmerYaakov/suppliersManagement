@@ -7,6 +7,7 @@ import transactionRoute from "./Routes/transactionRoute.js";
 import supplierRoute from "./Routes/supplierRoute.js";
 import receiversRout from "./Routes/receiverTransactionRoute.js";
 import transactionCategoryRoute from "./Routes/transactionCategoryRoute.js";
+import transactionTypeRoute from "./Routes/transactionTypeRoute.js";
 
 dotenv.config();
 const app = express();
@@ -31,4 +32,5 @@ app.use("/transaction", transactionRoute);
 app.use("/supplier", supplierRoute);
 app.use("/receivers", receiversRout);
 app.use("/transactionCategory", transactionCategoryRoute);
+app.use("/transactionType", transactionTypeRoute);
 export default app;
