@@ -49,6 +49,8 @@ const Transaction = () => {
     fetchCategory();
   }, []);
 
+  //fetch data
+
   const fetchSuppliers = async () => {
     try {
       const res = await axios.get("/supplier/get");
@@ -88,53 +90,9 @@ const Transaction = () => {
     }
   };
 
+  //general
+
   const handleInputChange = (setter) => (event) => setter(event.target.value);
-
-  const handleAddReceiver = async () => {
-    try {
-      const res = await axios.post("/receivers/create", { receiverName: newReceiver });
-      setReceivers((prev) => [...prev, res.data]); // Update receivers list
-      setSelectedReceiver(newReceiver); // Set the newly added receiver
-      setNewReceiver(""); // Clear input
-      setOpenAddReceiverDialog(false); // Close the dialog
-    } catch (error) {
-      console.error("Error adding new receiver:", error);
-    }
-  };
-
-  const handleAddCategory = async () => {
-    try {
-      const res = await axios.post("/transactionCategory/create", { categoryName: newCategory });
-      setTransactionCategories((prev) => [...prev, res.data]); // Update categories list
-      setSelectedTransactionCategory(newCategory); // Set the newly added category
-      setNewCategory(""); // Clear input
-      setOpenAddCategoryDialog(false); // Close the dialog
-    } catch (error) {
-      console.error("Error adding new category:", error);
-    }
-  };
-
-  const handleRemoveReceiver = async (receiverId) => {
-    try {
-      await axios.delete(`/receivers/delete/${receiverId}`);
-      setReceivers((prev) => prev.filter((receiver) => receiver._id !== receiverId));
-      if (selectedReceiver === receiverId) {
-        setSelectedReceiver("");
-      }
-    } catch (error) {
-      console.error("Error removing receiver:", error);
-    }
-  };
-
-  const handleReceiversDialogClose = () => {
-    setOpenAddReceiverDialog(false);
-    setNewReceiver("");
-  };
-
-  const handleCategoryDialogClose = () => {
-    setOpenAddCategoryDialog(false);
-    setNewCategory("");
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -167,6 +125,70 @@ const Transaction = () => {
         alert("קיימת עסקה עם אותו מספר.");
       }
       console.error("Error creating transaction:", error);
+    }
+  };
+
+  //receivers
+
+  const handleAddReceiver = async () => {
+    try {
+      const res = await axios.post("/receivers/create", { receiverName: newReceiver });
+      setReceivers((prev) => [...prev, res.data]); // Update receivers list
+      setSelectedReceiver(newReceiver); // Set the newly added receiver
+      setNewReceiver(""); // Clear input
+      setOpenAddReceiverDialog(false); // Close the dialog
+    } catch (error) {
+      console.error("Error adding new receiver:", error);
+    }
+  };
+
+  const handleRemoveReceiver = async (receiverId) => {
+    try {
+      await axios.delete(`/receivers/delete/${receiverId}`);
+      setReceivers((prev) => prev.filter((receiver) => receiver._id !== receiverId));
+      if (selectedReceiver === receiverId) {
+        setSelectedReceiver("");
+      }
+    } catch (error) {
+      console.error("Error removing receiver:", error);
+    }
+  };
+
+  const handleReceiversDialogClose = () => {
+    setOpenAddReceiverDialog(false);
+    setNewReceiver("");
+  };
+
+  //category
+
+  const handleAddCategory = async () => {
+    try {
+      const res = await axios.post("/transactionCategory/create", { categoryName: newCategory });
+      setTransactionCategories((prev) => [...prev, res.data]); // Update categories list
+      setSelectedTransactionCategory(newCategory); // Set the newly added category
+      setNewCategory(""); // Clear input
+      setOpenAddCategoryDialog(false); // Close the dialog
+    } catch (error) {
+      console.error("Error adding new category:", error);
+    }
+  };
+
+  const handleCategoryDialogClose = () => {
+    setOpenAddCategoryDialog(false);
+    setNewCategory("");
+  };
+
+  const handleRemoveCategory = async (categoryId) => {
+    try {
+      console.log(categoryId);
+
+      await axios.delete(`/transactionCategory/delete/${categoryId}`);
+      setTransactionCategories((prev) => prev.filter((category) => category._id != categoryId));
+      if (selectedTransactionCategory === categoryId) {
+        setSelectedTransactionCategory("");
+      }
+    } catch (error) {
+      console.error("Error remving category:", error);
     }
   };
 
@@ -216,7 +238,6 @@ const Transaction = () => {
           onChange={handleInputChange(setTransactionNumber)}
           fullWidth
           margin="normal"
-          required
           type="number"
         />
 
@@ -226,7 +247,6 @@ const Transaction = () => {
           onChange={handleInputChange(setTransactionAmount)}
           fullWidth
           margin="normal"
-          required
           type="number"
         />
 
@@ -236,7 +256,6 @@ const Transaction = () => {
           onChange={handleInputChange(setTransactionDate)}
           fullWidth
           margin="normal"
-          required
           type="date"
           InputLabelProps={{
             shrink: true,
@@ -262,14 +281,16 @@ const Transaction = () => {
             {receiversTransaction.map((receiver) => (
               <MenuItem key={receiver._id} value={receiver.receiverName}>
                 <ListItemIcon>
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveReceiver(receiver._id);
-                    }}
-                    size="small">
-                    <CloseIcon fontSize="small" />
-                  </IconButton>
+                  {selectedReceiver !== receiver.receiverName && (
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveReceiver(receiver._id);
+                      }}
+                      size="small">
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  )}
                 </ListItemIcon>
                 <ListItemText primary={receiver.receiverName} />
               </MenuItem>
@@ -318,14 +339,16 @@ const Transaction = () => {
             {transactionCategories.map((category) => (
               <MenuItem key={category._id} value={category.categoryName}>
                 <ListItemIcon>
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveReceiver(category._id);
-                    }}
-                    size="small">
-                    <CloseIcon fontSize="small" />
-                  </IconButton>
+                  {selectedTransactionCategory !== category.categoryName && (
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveCategory(category._id);
+                      }}
+                      size="small">
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  )}
                 </ListItemIcon>
                 <ListItemText primary={category.categoryName} />
               </MenuItem>
