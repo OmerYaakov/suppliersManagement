@@ -42,4 +42,39 @@ const getAllSuppliers = async (req, res) => {
 
 const getById = async (req, res) => {};
 
-export default { createSupplier, getAllSuppliers, getById };
+const updateSupplier = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { sumAmount } = req.body; // Only update the sumAmount field
+
+    const updatedSupplier = await supplierModel.findByIdAndUpdate(
+      id,
+      { $set: { sumAmount } }, // Update only the sumAmount field
+      { new: true }
+    );
+
+    if (!updatedSupplier) {
+      return res.status(404).json({ message: "Supplier not found" });
+    }
+
+    res.status(200).json(updatedSupplier);
+  } catch (error) {
+    console.error("Error updating supplier:", error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getSumAmount = async (req, res) => {
+  try {
+    console.log("getting sumAmount");
+    const { supplierName } = req.query;
+    console.log(supplierName);
+    const sumAmount = await supplierModel.findOne({ supplierName: supplierName }, `sumAmount`);
+
+    res.status(201).json(sumAmount);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export default { createSupplier, getAllSuppliers, getById, updateSupplier, getSumAmount };
