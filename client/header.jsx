@@ -1,6 +1,7 @@
 import React from "react";
 import Transaction from "./src/pages.jsx/transactionPage/transaction";
 import Supplier from "./src/pages.jsx/addSuppliersPage/addSuppliers";
+import SupplierLedger from "./src/pages.jsx/supplierLedgerPage/supplierLedger";
 
 const header = () => {
   return (
@@ -34,7 +35,7 @@ const header = () => {
               </a>
             </li>
             <li>
-              <a href="#" className="nav-link px-2 text-white">
+              <a href="SupplierLedger" className="nav-link px-2 text-white">
                 כרטסת ספקים
               </a>
             </li>
