@@ -5,6 +5,7 @@ const transactionTypeSchema = mongoose.Schema({
     type: String,
     require: true,
     unique: true,
+    trim: true,
   },
 });
 

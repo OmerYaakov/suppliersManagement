@@ -166,6 +166,9 @@ const Transaction = () => {
         setSelectedReceiver("");
       }
     } catch (error) {
+      if (error.response?.status === 409) {
+        alert("קיימת עסקה עם אותו מספר.");
+      }
       console.error("Error removing receiver:", error);
     }
   };
@@ -185,6 +188,9 @@ const Transaction = () => {
       setNewCategory(""); // Clear input
       setOpenAddCategoryDialog(false); // Close the dialog
     } catch (error) {
+      if (error.response?.status === 409) {
+        alert("קיימת קטגוריה עם אותו שם.");
+      }
       console.error("Error adding new category:", error);
     }
   };
@@ -216,6 +222,9 @@ const Transaction = () => {
       setNewType("");
       setOpenAddTypeDialog(false);
     } catch (error) {
+      if (error.response?.status === 409) {
+        alert("קיימת סוג עסקה עם אותו שם.");
+      }
       console.error("Error adding new type: ", error);
     }
   };
