@@ -1,4 +1,4 @@
-import trasactionCategory from "../Models/transactionCategoryModel.js";
+import transactionCategory from "../Models/transactionCategoryModel.js";
 
 const createCategory = async (req, res) => {
   try {
@@ -7,7 +7,7 @@ const createCategory = async (req, res) => {
     const { categoryName } = req.body;
 
     // Check if the category already exists
-    const existingCategory = await trasactionCategory.findOne({
+    const existingCategory = await transactionCategory.findOne({
       categoryName: categoryName,
     });
 
@@ -18,7 +18,7 @@ const createCategory = async (req, res) => {
     }
 
     // Create a new category
-    const newCategory = await trasactionCategory.create({
+    const newCategory = await transactionCategory.create({
       categoryName,
     });
 
@@ -32,7 +32,7 @@ const createCategory = async (req, res) => {
 const getAllCategory = async (req, res) => {
   try {
     console.log("getting all categories... ");
-    const categories = await trasactionCategory.find();
+    const categories = await transactionCategory.find();
     res.status(200).json(categories);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -46,7 +46,7 @@ const getByCategory = async (req, res) => {
     if (!category) {
       return res.status(400).json({ message: "Category name is required!" });
     }
-    const data = await trasactionCategory.find({ categoryName: category });
+    const data = await transactionCategory.find({ categoryName: category });
     if (data.lengh === 0) {
       return res.status(400).json({ message: "No data found for the provided category" });
     }
@@ -59,8 +59,10 @@ const getByCategory = async (req, res) => {
 
 const deleteCategory = async (req, res) => {
   try {
+    console.log("deletק category...");
+
     const categoryId = req.params.id;
-    const deleteCategory = await trasactionCategory.findByIdAndDelete(categoryId);
+    const deleteCategory = await transactionCategory.findByIdAndDelete(categoryId);
     if (!deleteCategory) {
       return res.status(404).json({ message: "Category not found" });
     }

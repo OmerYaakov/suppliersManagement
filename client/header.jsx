@@ -1,6 +1,6 @@
 import React from "react";
 import Transaction from "./src/pages.jsx/transactionPage/transaction";
-import Supplier from "./src/pages.jsx/suppliersPage/suppliers";
+import Supplier from "./src/pages.jsx/addSuppliersPage/addSuppliers";
 
 const header = () => {
   return (
@@ -13,7 +13,7 @@ const header = () => {
             <svg className="bi me-2" width="40" height="32" role="img" aria-label="Logo">
               <use xlinkHref="#bootstrap" />
             </svg>
-            <span className="fs-4">ניהול ספקים</span>
+            <span className="fs-4">מערכת לניהול ספקים</span>
           </a>
 
           {/* Navbar Links */}

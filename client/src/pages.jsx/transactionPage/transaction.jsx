@@ -24,8 +24,10 @@ const Transaction = () => {
   const [selectedSupplier, setSelectedSupplier] = useState("");
   const [newSupplier, setNewSupplier] = useState("");
 
-  const [transactionTypes] = useState(["חשבונית", "קבלה", "חשבונית-קבלה"]);
+  const [transactionTypes, setTransactionTypes] = useState([]);
   const [selectedTransactionType, setSelectedTransactionType] = useState("");
+  const [newType, setNewType] = useState("");
+  const [openAddTypeDialog, setOpenAddTypeDialog] = useState(false);
 
   const [transactionNumber, setTransactionNumber] = useState("");
   const [transactionAmount, setTransactionAmount] = useState("");
@@ -47,6 +49,7 @@ const Transaction = () => {
     fetchSuppliers();
     fetchReceivers();
     fetchCategory();
+    fetchTypes();
   }, []);
 
   //fetch data
@@ -87,6 +90,19 @@ const Transaction = () => {
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
+    }
+  };
+
+  const fetchTypes = async () => {
+    try {
+      const res = await axios.get("/transactionType/get");
+      if (Array.isArray(res.data)) {
+        setTransactionTypes(res.data);
+      } else {
+        setTransactionTypes([]);
+      }
+    } catch (error) {
+      console.error("Error fetching types: ", error);
     }
   };
 
@@ -180,16 +196,45 @@ const Transaction = () => {
 
   const handleRemoveCategory = async (categoryId) => {
     try {
-      console.log(categoryId);
-
       await axios.delete(`/transactionCategory/delete/${categoryId}`);
       setTransactionCategories((prev) => prev.filter((category) => category._id != categoryId));
       if (selectedTransactionCategory === categoryId) {
         setSelectedTransactionCategory("");
       }
     } catch (error) {
-      console.error("Error remving category:", error);
+      console.error("Error removing category:", error);
     }
+  };
+
+  //types
+
+  const handleAddType = async () => {
+    try {
+      const res = await axios.post("/transactionType/create", { typeName: newType });
+      setTransactionTypes((prev) => [...prev, res.data]);
+      setSelectedTransactionType(res.data.typeName);
+      setNewType("");
+      setOpenAddTypeDialog(false);
+    } catch (error) {
+      console.error("Error adding new type: ", error);
+    }
+  };
+
+  const handleRemoveType = async (typeId) => {
+    try {
+      axios.delete(`/transactionType/delete/${typeId}`);
+      setTransactionTypes((prev) => prev.filter((type) => type._id != typeId));
+      if (selectedTransactionType === typeId) {
+        setSelectedTransactionType("");
+      }
+    } catch (error) {
+      console.error("Error removing type: ", error);
+    }
+  };
+
+  const handleTypeDialogClose = () => {
+    setOpenAddTypeDialog(false);
+    setNewType("");
   };
 
   return (
@@ -215,22 +260,62 @@ const Transaction = () => {
         </FormControl>
 
         <FormControl fullWidth margin="normal">
-          <InputLabel>סוג העסקה</InputLabel>
+          <InputLabel>סוג עסקה</InputLabel>
           <Select
             value={selectedTransactionType}
-            onChange={handleInputChange(setSelectedTransactionType)}
-            label="Transaction Type"
+            onChange={(event) => {
+              if (event.target.value === "add-new") {
+                setOpenAddTypeDialog(true);
+              } else {
+                setSelectedTransactionType(event.target.value);
+              }
+            }}
+            label="סוג העסקה"
             required>
             <MenuItem value="" disabled>
               בחר סוג עסקה
             </MenuItem>
-            {transactionTypes.map((type, index) => (
-              <MenuItem key={index} value={type}>
-                {type}
+            {transactionTypes.map((type) => (
+              <MenuItem key={type._id} value={type.typeName}>
+                <ListItemIcon>
+                  {selectedTransactionType !== type.typeName && (
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveType(type._id);
+                      }}
+                      size="small">
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </ListItemIcon>
+                <ListItemText primary={type.typeName} />
               </MenuItem>
             ))}
+            <MenuItem value="add-new"> הוסף סוג עסקה חדש</MenuItem>
           </Select>
         </FormControl>
+
+        <Dialog open={openAddTypeDialog} onClose={handleTypeDialogClose}>
+          <DialogTitle>הוסף סוג עסקה חדש</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="סוג עסקה"
+              type="text"
+              fullWidth
+              value={newType}
+              onChange={(e) => setNewType(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleTypeDialogClose}>ביטול</Button>
+            <Button onClick={handleAddType} variant="contained">
+              הוסף
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <TextField
           label="מספר עסקה"
