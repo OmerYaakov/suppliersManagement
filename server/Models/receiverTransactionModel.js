@@ -4,6 +4,7 @@ const receiverTransactionSchema = mongoose.Schema({
   receiverName: {
     type: String,
     require: true,
+    trim: true,
   },
 });
 
