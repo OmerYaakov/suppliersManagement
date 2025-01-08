@@ -64,12 +64,12 @@ const SupplierLedger = () => {
         setTransactionBySupplier([]);
       }
 
-      const resAmount = await axios.get(`/supplier/getSumAmount`, { params: { supplierName } });
-      if (resAmount.data && typeof resAmount.data.sumAmount === "number") {
-        setSumAmountSelectedSupplier(resAmount.data.sumAmount);
-      } else {
-        setSumAmountSelectedSupplier(0);
-      }
+      // const resAmount = await axios.get(`/supplier/getSumAmount`, { params: { supplierName } });
+      // if (resAmount.data && typeof resAmount.data.sumAmount === "number") {
+      //   setSumAmountSelectedSupplier(resAmount.data.sumAmount);
+      // } else {
+      //   setSumAmountSelectedSupplier(0);
+      // }
     } catch (error) {
       console.error("Error getting transaction by supplier:", error);
       setTransactionBySupplier([]);
@@ -114,7 +114,7 @@ const SupplierLedger = () => {
               <TableCell>מספר עסקה</TableCell>
               <TableCell>סכום קבלה</TableCell>
               <TableCell>סכום חשבונית</TableCell>
-              <TableCell>זיכוי</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -132,14 +132,16 @@ const SupplierLedger = () => {
                     transaction.transactionType === "חשבונית-קבלה") &&
                     transaction.transactionAmount}
                 </TableCell>
-                <TableCell>
+                <TableCell
+                  style={{
+                    color: transaction.transactionType === "זיכוי" ? "red" : "inherit",
+                  }}>
                   {(transaction.transactionType === "חשבונית" ||
-                    transaction.transactionType === "חשבונית-קבלה") &&
+                    transaction.transactionType === "חשבונית-קבלה" ||
+                    transaction.transactionType === "זיכוי") &&
                     transaction.transactionAmount}
                 </TableCell>
-                <TableCell>
-                  {transaction.transactionType === "זיכוי" && transaction.transactionAmount}
-                </TableCell>
+                <TableCell></TableCell>
               </TableRow>
             ))}
           </TableBody>
