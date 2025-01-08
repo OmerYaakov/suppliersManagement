@@ -16,6 +16,7 @@ const createTransaction = async (req, res) => {
   try {
     const exsitingTransaction = await trasactionModel.findOne({
       transactionNumber: transactionNumber,
+      supplierName: supplierName,
     });
     if (exsitingTransaction) {
       return res.status(409).json({ message: "transaction with this number is already exists" });
@@ -49,7 +50,9 @@ const getBySupplier = async (req, res) => {
     if (transacions.lengh === 0) {
       return res.status(404).message({ message: "there is no transaction with this supplier" });
     }
+
     res.status(200).json(transacions);
+    console.log(supplierName);
   } catch (error) {
     console.error(`there is an error:`, error.message);
   }

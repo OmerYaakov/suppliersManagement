@@ -123,6 +123,12 @@ const Transaction = () => {
         transactionCategory: selectedTransactionCategory,
         notes,
       };
+      if (selectedTransactionType === "זיכוי") {
+        // Ensure transactionAmount starts with a "-"
+        if (!transactionAmount.startsWith("-")) {
+          return alert("אם בחרת זיכוי הסכום חייב להיות במינוס (לדוגמה: -100)");
+        }
+      }
 
       const res = await axios.post("/transaction/create", newTransaction);
 
