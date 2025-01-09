@@ -64,12 +64,14 @@ const SupplierLedger = () => {
         setTransactionBySupplier([]);
       }
 
-      // const resAmount = await axios.get(`/supplier/getSumAmount`, { params: { supplierName } });
-      // if (resAmount.data && typeof resAmount.data.sumAmount === "number") {
-      //   setSumAmountSelectedSupplier(resAmount.data.sumAmount);
-      // } else {
-      //   setSumAmountSelectedSupplier(0);
-      // }
+      const resAmount = await axios.get(`/supplier/getSupplierAmount`, {
+        params: { supplierName },
+      });
+      if (resAmount.data && typeof resAmount.data.sumAmount === "number") {
+        setSumAmountSelectedSupplier(resAmount.data.sumAmount);
+      } else {
+        setSumAmountSelectedSupplier(0);
+      }
     } catch (error) {
       console.error("Error getting transaction by supplier:", error);
       setTransactionBySupplier([]);
@@ -102,7 +104,7 @@ const SupplierLedger = () => {
               </MenuItem>
             ))}
           </Select>
-          <h1>סכום כולל: {sumAmountSelectedSupplier || 0}</h1>{" "}
+          <h1>סכום כולל: {sumAmountSelectedSupplier || 0} ₪</h1>{" "}
         </FormControl>
       </Box>
       <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
@@ -130,7 +132,7 @@ const SupplierLedger = () => {
                 <TableCell>
                   {(transaction.transactionType === "קבלה" ||
                     transaction.transactionType === "חשבונית-קבלה") &&
-                    transaction.transactionAmount}
+                    `${transaction.transactionAmount} ₪`}
                 </TableCell>
                 <TableCell
                   style={{
@@ -139,7 +141,7 @@ const SupplierLedger = () => {
                   {(transaction.transactionType === "חשבונית" ||
                     transaction.transactionType === "חשבונית-קבלה" ||
                     transaction.transactionType === "זיכוי") &&
-                    transaction.transactionAmount}
+                    `${transaction.transactionAmount} ₪`}
                 </TableCell>
                 <TableCell></TableCell>
               </TableRow>

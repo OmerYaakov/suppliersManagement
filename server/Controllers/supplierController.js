@@ -66,15 +66,50 @@ const updateSupplier = async (req, res) => {
 
 const getSumAmount = async (req, res) => {
   try {
-    console.log("getting sumAmount");
-    const { supplierName } = req.query;
-    console.log(supplierName);
-    const sumAmount = await supplierModel.findOne({ supplierName: supplierName }, `sumAmount`);
+    console.log("Getting sumAmount...");
 
-    res.status(201).json(sumAmount);
+    const { supplierName } = req.query;
+
+    // Ensure `supplierName` is provided
+    if (!supplierName) {
+      return res.status(400).json({ error: "Missing required field: supplierName" });
+    }
+
+    const supplier = await supplierModel.findOne({ supplierName }, "sumAmount");
+
+    if (supplier) {
+      res.status(200).json({ sumAmount: supplier.sumAmount });
+    } else {
+      res.status(404).json({ message: "Supplier not found" });
+    }
   } catch (error) {
-    console.error(error);
+    console.error("Error retrieving sumAmount:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-export default { createSupplier, getAllSuppliers, getById, updateSupplier, getSumAmount };
+const updateSupplierAmount = async (req, res) => {
+  try {
+    console.log("Updating supplier amount...");
+
+    const { filter, update, options } = req.body;
+
+    // Ensure `filter`, `update`, and `options` are provided
+    if (!filter || !update || !options) {
+      return res.status(400).json({ error: "Missing required fields: filter, update, options" });
+    }
+
+    const result = await supplierModel.findOneAndUpdate(filter, update, options);
+
+    if (result) {
+      res.status(200).json({ message: "Supplier updated successfully", data: result });
+    } else {
+      res.status(404).json({ message: "Supplier not found" });
+    }
+  } catch (error) {
+    console.error("Error updating supplier:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export default { createSupplier, getAllSuppliers, getById, updateSupplierAmount, getSumAmount };

@@ -112,6 +112,7 @@ const Transaction = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const newTransaction = {
         supplierName: selectedSupplier,
@@ -123,16 +124,20 @@ const Transaction = () => {
         transactionCategory: selectedTransactionCategory,
         notes,
       };
+
+      // Ensure transactionAmount is negative for "זיכוי"
       if (selectedTransactionType === "זיכוי") {
-        // Ensure transactionAmount starts with a "-"
         if (!transactionAmount.startsWith("-")) {
           return alert("אם בחרת זיכוי הסכום חייב להיות במינוס (לדוגמה: -100)");
         }
       }
 
-      const res = await axios.post("/transaction/create", newTransaction);
+      // Create the new transaction
+      const transactionResponse = await axios.post("/transaction/create", newTransaction);
+      console.log("Transaction created successfully:", transactionResponse.data);
 
-      console.log("Transaction created successfully:", res.data);
+      // Update the supplier amount
+      await updateSupplierAmount(selectedSupplier, transactionAmount);
 
       // Reset form
       setSelectedSupplier("");
@@ -143,11 +148,14 @@ const Transaction = () => {
       setSelectedReceiver("");
       setSelectedTransactionCategory("");
       setNotes("");
+
+      alert("Transaction created and supplier amount updated successfully!");
     } catch (error) {
       if (error.response?.status === 409) {
         alert("קיימת עסקה עם אותו מספר.");
+      } else {
+        console.error("Error creating transaction or updating supplier:", error);
       }
-      console.error("Error creating transaction:", error);
     }
   };
 
@@ -185,6 +193,31 @@ const Transaction = () => {
     setNewReceiver("");
   };
 
+  //supplier
+  const updateSupplierAmount = async (selectedSupplier, transactionAmount) => {
+    try {
+      // Fetch the current supplier amount
+      const { data: supplierData } = await axios.get("/supplier/getSupplierAmount/", {
+        params: { supplierName: selectedSupplier },
+      });
+
+      const currentAmount = supplierData?.sumAmount || 0; // Ensure we have a default value if no amount exists
+      const newAmount = parseFloat(currentAmount) + parseFloat(transactionAmount); // Calculate the new amount
+
+      // Update the supplier amount in the database
+      const response = await axios.post("/supplier/updateAmount", {
+        filter: { supplierName: selectedSupplier },
+        update: { $set: { sumAmount: newAmount } },
+        options: { upsert: true, returnDocument: "after" },
+      });
+
+      console.log("Updated supplier document:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating supplier amount:", error.response?.data || error.message);
+      throw new Error("Failed to update supplier amount.");
+    }
+  };
   //category
 
   const handleAddCategory = async () => {
