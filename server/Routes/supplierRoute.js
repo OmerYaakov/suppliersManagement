@@ -6,12 +6,12 @@ const router = new Router();
 
 router.get("/get", SupplierController.getAllSuppliers);
 
-router.get("/get/:_id", SupplierController.getById);
+router.get("/get/:id", SupplierController.getById);
 
 router.post("/create", SupplierController.createSupplier);
 
-//router.put("/update", SupplierController.updateSupplier);
+router.post("/updateAmount", SupplierController.updateSupplierAmount);
 
-router.patch("/update/:id", supplierController.updateSupplier);
+router.get("/getSupplierAmount", supplierController.getSumAmount);
 
 export default router;
