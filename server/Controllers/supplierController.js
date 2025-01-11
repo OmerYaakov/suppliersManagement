@@ -92,14 +92,14 @@ const updateSupplierAmount = async (req, res) => {
   try {
     console.log("Updating supplier amount...");
 
-    const { filter, update, options } = req.body;
+    const { filter, update } = req.body;
 
     // Ensure `filter`, `update`, and `options` are provided
-    if (!filter || !update || !options) {
+    if (!filter || !update) {
       return res.status(400).json({ error: "Missing required fields: filter, update, options" });
     }
 
-    const result = await supplierModel.findOneAndUpdate(filter, update, options);
+    const result = await supplierModel.findOneAndUpdate(filter, update);
 
     if (result) {
       res.status(200).json({ message: "Supplier updated successfully", data: result });
