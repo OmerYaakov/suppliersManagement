@@ -1,3 +1,4 @@
+import "./supplierLedger.css";
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -104,7 +105,16 @@ const SupplierLedger = () => {
               </MenuItem>
             ))}
           </Select>
-          <h1>סה"כ יתרה: {(Number(sumAmountSelectedSupplier) || 0).toFixed(2)} ₪</h1>
+          <h1 className="sumAmount">
+            סה"כ יתרה:
+            <h1
+              className="supplierSumAmount"
+              style={{
+                color: String(sumAmountSelectedSupplier).includes("-") ? "red" : "inherit",
+              }}>
+              {(Number(sumAmountSelectedSupplier) || 0).toFixed(2)} ₪
+            </h1>
+          </h1>
         </FormControl>
       </Box>
       <TableContainer component={Paper} sx={{ marginTop: "20px" }}>

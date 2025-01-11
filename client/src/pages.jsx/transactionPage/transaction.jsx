@@ -203,6 +203,8 @@ const Transaction = () => {
       let newAmount;
       if (transactionType === "קבלה") {
         newAmount = parseFloat(currentAmount) - parseFloat(transactionAmount); // Calculate the new amount
+      } else if (transactionType === "חשבונית-קבלה") {
+        newAmount = parseFloat(currentAmount);
       } else {
         newAmount = parseFloat(currentAmount) + parseFloat(transactionAmount); // Calculate the new amount
       }

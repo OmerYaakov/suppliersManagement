@@ -1,0 +1,13 @@
+.sumAmount {
+  display: flex;
+  align-items: center;
+}
+
+.supplierSumAmountPos {
+  margin: 0 10px 0 10px;
+  color: black;
+}
+.supplierSumAmountNeg {
+  margin: 0 10px 0 10px;
+  color: red;
+}
