@@ -104,7 +104,7 @@ const SupplierLedger = () => {
               </MenuItem>
             ))}
           </Select>
-          <h1>סכום כולל: {sumAmountSelectedSupplier || 0} ₪</h1>{" "}
+          <h1>סה"כ יתרה: {(Number(sumAmountSelectedSupplier) || 0).toFixed(2)} ₪</h1>
         </FormControl>
       </Box>
       <TableContainer component={Paper} sx={{ marginTop: "20px" }}>

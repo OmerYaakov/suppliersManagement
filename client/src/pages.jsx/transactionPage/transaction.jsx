@@ -137,7 +137,7 @@ const Transaction = () => {
       console.log("Transaction created successfully:", transactionResponse.data);
 
       // Update the supplier amount
-      await updateSupplierAmount(selectedSupplier, transactionAmount);
+      await updateSupplierAmount(selectedSupplier, transactionAmount, selectedTransactionType);
 
       // Reset form
       setSelectedSupplier("");
@@ -148,8 +148,6 @@ const Transaction = () => {
       setSelectedReceiver("");
       setSelectedTransactionCategory("");
       setNotes("");
-
-      alert("Transaction created and supplier amount updated successfully!");
     } catch (error) {
       if (error.response?.status === 409) {
         alert("קיימת עסקה עם אותו מספר.");
@@ -194,7 +192,7 @@ const Transaction = () => {
   };
 
   //supplier
-  const updateSupplierAmount = async (selectedSupplier, transactionAmount) => {
+  const updateSupplierAmount = async (selectedSupplier, transactionAmount, transactionType) => {
     try {
       // Fetch the current supplier amount
       const { data: supplierData } = await axios.get("/supplier/getSupplierAmount/", {
@@ -202,13 +200,17 @@ const Transaction = () => {
       });
 
       const currentAmount = supplierData?.sumAmount || 0; // Ensure we have a default value if no amount exists
-      const newAmount = parseFloat(currentAmount) + parseFloat(transactionAmount); // Calculate the new amount
+      let newAmount;
+      if (transactionType === "קבלה") {
+        newAmount = parseFloat(currentAmount) - parseFloat(transactionAmount); // Calculate the new amount
+      } else {
+        newAmount = parseFloat(currentAmount) + parseFloat(transactionAmount); // Calculate the new amount
+      }
 
       // Update the supplier amount in the database
       const response = await axios.post("/supplier/updateAmount", {
         filter: { supplierName: selectedSupplier },
         update: { $set: { sumAmount: newAmount } },
-        options: { upsert: true, returnDocument: "after" },
       });
 
       console.log("Updated supplier document:", response.data);
@@ -284,6 +286,24 @@ const Transaction = () => {
   const handleTypeDialogClose = () => {
     setOpenAddTypeDialog(false);
     setNewType("");
+  };
+
+  //amount
+
+  const handleTransactionAmountChange = (event) => {
+    const value = event.target.value;
+
+    // Allow only numbers with up to two decimal places
+    const formattedValue = value.match(/^-?\d*(\.\d{0,2})?$/) ? value : transactionAmount;
+
+    setTransactionAmount(formattedValue);
+  };
+
+  const handleTransactionAmountBlur = () => {
+    if (transactionAmount) {
+      // Format the value to two decimal places
+      setTransactionAmount(parseFloat(transactionAmount).toFixed(2));
+    }
   };
 
   return (
@@ -378,10 +398,11 @@ const Transaction = () => {
         <TextField
           label="סכום העסקה בשקלים"
           value={transactionAmount}
-          onChange={handleInputChange(setTransactionAmount)}
+          onChange={handleTransactionAmountChange}
+          onBlur={handleTransactionAmountBlur}
           fullWidth
           margin="normal"
-          type="number"
+          type="text" // Use "text" instead of "number" to allow proper formatting
         />
 
         <TextField
