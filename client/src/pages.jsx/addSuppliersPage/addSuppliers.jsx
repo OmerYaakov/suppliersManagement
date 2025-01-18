@@ -40,6 +40,24 @@ const addSupplier = () => {
 
   const handleInputChange = (setter) => (event) => setter(event.target.value);
 
+  const handleSupplierPhoneNumberChange = (event) => {
+    const value = event.target.value;
+    // Allow only numbers and "+" at the start
+    const validValue = /^\+?\d*$/.test(value);
+    if (validValue || value === "") {
+      setPhone(value);
+    }
+  };
+
+  const handleContactPhoneNumberChange = (event) => {
+    const value = event.target.value;
+    // Allow only numbers and "+" at the start
+    const validValue = /^\+?\d*$/.test(value);
+    if (validValue || value === "") {
+      setContactPhone(value);
+    }
+  };
+
   return (
     <>
       <Box sx={{ maxWidth: 600, margin: "0 auto", padding: 3 }}>
@@ -69,7 +87,7 @@ const addSupplier = () => {
             <TextField
               label="טלפון"
               value={phone}
-              onChange={handleInputChange(setPhone)}
+              onChange={handleSupplierPhoneNumberChange}
               fullWidth
               required
               type="tel"
@@ -88,7 +106,7 @@ const addSupplier = () => {
             <TextField
               label="טלפון איש קשר "
               value={contactPhone}
-              onChange={handleInputChange(setContactPhone)}
+              onChange={handleContactPhoneNumberChange}
               fullWidth
               type="text"
             />

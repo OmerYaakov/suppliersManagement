@@ -8,22 +8,10 @@ const header = () => {
     <header className="p-3 text-bg-primary">
       <div className="container">
         <div className="d-flex flex-wrap align-items-center justify-content-between ">
-          <a
-            href="/"
-            className="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-            <svg className="bi me-2" width="40" height="32" role="img" aria-label="Logo">
-              <use xlinkHref="#bootstrap" />
-            </svg>
-            <span className="fs-4">מערכת לניהול ספקים</span>
-          </a>
+          <span className="fs-4">מערכת לניהול ספקים</span>
 
           {/* Navbar Links */}
           <ul className="nav col-12 col-lg-auto mb-2 justify-content-center mb-md-0">
-            <li>
-              <a href="/" className="nav-link px-2 text-white">
-                בית
-              </a>
-            </li>
             <li>
               <a href="/Transaction" className="nav-link px-2 text-white">
                 הוספת עסקה
