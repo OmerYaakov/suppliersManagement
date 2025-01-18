@@ -14,6 +14,10 @@ import {
   IconButton,
   ListItemText,
   ListItemIcon,
+  styled,
+  List,
+  ListItem,
+  Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
@@ -44,6 +48,11 @@ const AddTransaction = () => {
   const [openAddCategoryDialog, setOpenAddCategoryDialog] = useState(false);
 
   const [notes, setNotes] = useState("");
+
+  const [files, setFiles] = useState([]);
+  const HiddenInput = styled("input")({
+    display: "none", // This hides the default file input button
+  });
 
   useEffect(() => {
     fetchSuppliers();
@@ -112,18 +121,21 @@ const AddTransaction = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
 
     try {
-      const newTransaction = {
-        supplierName: selectedSupplier,
-        transactionType: selectedTransactionType,
-        transactionNumber,
-        transactionAmount,
-        transactionDate,
-        receivesTransaction: selectedReceiver,
-        transactionCategory: selectedTransactionCategory,
-        notes,
-      };
+      formData.append("supplierName", selectedSupplier);
+      formData.append("transactionType", selectedTransactionType);
+      formData.append("transactionNumber", transactionNumber);
+      formData.append("transactionDate", transactionDate);
+      formData.append("transactionAmount", transactionAmount);
+      formData.append("receivesTransaction", selectedReceiver);
+      formData.append("transactionCategory", selectedTransactionCategory);
+      formData.append("notes", notes);
+
+      Array.from(files).forEach((file, index) => {
+        formData.append("file", file);
+      });
 
       // Ensure transactionAmount is negative for "זיכוי"
       if (selectedTransactionType === "זיכוי") {
@@ -133,7 +145,8 @@ const AddTransaction = () => {
       }
 
       // Create the new transaction
-      const transactionResponse = await axios.post("/transaction/create", newTransaction);
+
+      const transactionResponse = await axios.post("./transaction/create", formData);
       console.log("Transaction created successfully:", transactionResponse.data);
 
       // Update the supplier amount
@@ -148,6 +161,7 @@ const AddTransaction = () => {
       setSelectedReceiver("");
       setSelectedTransactionCategory("");
       setNotes("");
+      setFiles("");
     } catch (error) {
       if (error.response?.status === 409) {
         alert("קיימת עסקה עם אותו מספר.");
@@ -306,6 +320,15 @@ const AddTransaction = () => {
       // Format the value to two decimal places
       setTransactionAmount(parseFloat(transactionAmount).toFixed(2));
     }
+  };
+
+  const handleFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    setFiles((prevFiles) => [...prevFiles, ...files]);
+  };
+
+  const handleDeleteFile = (indexToDelete) => {
+    setFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToDelete));
   };
 
   return (
@@ -544,7 +567,43 @@ const AddTransaction = () => {
           multiline
           rows={2}
         />
+        <Box sx={{ marginTop: 3 }}>
+          {/* File Input and Button */}
+          <label htmlFor="files">
+            <HiddenInput
+              accept="image/*,application/pdf,.doc,.docx"
+              id="files"
+              type="file"
+              onChange={handleFileChange}
+              multiple // Allow multiple files
+            />
+            <Button variant="contained" component="span">
+              בחר קבצים
+            </Button>
+          </label>
 
+          {/* Display the list of selected file names */}
+          <List>
+            {files.length > 0 ? (
+              files.map((file, index) => (
+                <ListItem key={index}>
+                  <Typography variant="body1">{file.name}</Typography>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="small"
+                    onClick={() => handleDeleteFile(index)}>
+                    X
+                  </Button>
+                </ListItem>
+              ))
+            ) : (
+              <Typography variant="body1" sx={{ marginTop: 2 }}>
+                לא נבחרו קבצים
+              </Typography>
+            )}
+          </List>
+        </Box>
         <Button type="submit" variant="contained" fullWidth>
           שמור
         </Button>
