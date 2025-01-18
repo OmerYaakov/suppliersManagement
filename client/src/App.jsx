@@ -16,6 +16,7 @@ function App() {
           <Route path="/transaction" element={<Transaction />} />
           <Route path="/supplier" element={<Supplier />} />
           <Route path="/supplierLedger" element={<SupplierLedger />} />
+          <Route path="/" element={<SupplierLedger />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -112,6 +112,7 @@ const Transaction = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const newTransaction = {
         supplierName: selectedSupplier,
@@ -124,8 +125,19 @@ const Transaction = () => {
         notes,
       };
 
-      const res = await axios.post("/transaction/create", newTransaction);
-      console.log("Transaction created successfully:", res.data);
+      // Ensure transactionAmount is negative for "זיכוי"
+      if (selectedTransactionType === "זיכוי") {
+        if (!transactionAmount.startsWith("-")) {
+          return alert("אם בחרת זיכוי הסכום חייב להיות במינוס (לדוגמה: -100)");
+        }
+      }
+
+      // Create the new transaction
+      const transactionResponse = await axios.post("/transaction/create", newTransaction);
+      console.log("Transaction created successfully:", transactionResponse.data);
+
+      // Update the supplier amount
+      await updateSupplierAmount(selectedSupplier, transactionAmount, selectedTransactionType);
 
       // Reset form
       setSelectedSupplier("");
@@ -139,8 +151,9 @@ const Transaction = () => {
     } catch (error) {
       if (error.response?.status === 409) {
         alert("קיימת עסקה עם אותו מספר.");
+      } else {
+        console.error("Error creating transaction or updating supplier:", error);
       }
-      console.error("Error creating transaction:", error);
     }
   };
 
@@ -178,6 +191,37 @@ const Transaction = () => {
     setNewReceiver("");
   };
 
+  //supplier
+  const updateSupplierAmount = async (selectedSupplier, transactionAmount, transactionType) => {
+    try {
+      // Fetch the current supplier amount
+      const { data: supplierData } = await axios.get("/supplier/getSupplierAmount/", {
+        params: { supplierName: selectedSupplier },
+      });
+
+      const currentAmount = supplierData?.sumAmount || 0; // Ensure we have a default value if no amount exists
+      let newAmount;
+      if (transactionType === "קבלה") {
+        newAmount = parseFloat(currentAmount) - parseFloat(transactionAmount); // Calculate the new amount
+      } else if (transactionType === "חשבונית-קבלה") {
+        newAmount = parseFloat(currentAmount);
+      } else {
+        newAmount = parseFloat(currentAmount) + parseFloat(transactionAmount); // Calculate the new amount
+      }
+
+      // Update the supplier amount in the database
+      const response = await axios.post("/supplier/updateAmount", {
+        filter: { supplierName: selectedSupplier },
+        update: { $set: { sumAmount: newAmount } },
+      });
+
+      console.log("Updated supplier document:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating supplier amount:", error.response?.data || error.message);
+      throw new Error("Failed to update supplier amount.");
+    }
+  };
   //category
 
   const handleAddCategory = async () => {
@@ -244,6 +288,24 @@ const Transaction = () => {
   const handleTypeDialogClose = () => {
     setOpenAddTypeDialog(false);
     setNewType("");
+  };
+
+  //amount
+
+  const handleTransactionAmountChange = (event) => {
+    const value = event.target.value;
+
+    // Allow only numbers with up to two decimal places
+    const formattedValue = value.match(/^-?\d*(\.\d{0,2})?$/) ? value : transactionAmount;
+
+    setTransactionAmount(formattedValue);
+  };
+
+  const handleTransactionAmountBlur = () => {
+    if (transactionAmount) {
+      // Format the value to two decimal places
+      setTransactionAmount(parseFloat(transactionAmount).toFixed(2));
+    }
   };
 
   return (
@@ -338,10 +400,11 @@ const Transaction = () => {
         <TextField
           label="סכום העסקה בשקלים"
           value={transactionAmount}
-          onChange={handleInputChange(setTransactionAmount)}
+          onChange={handleTransactionAmountChange}
+          onBlur={handleTransactionAmountBlur}
           fullWidth
           margin="normal"
-          type="number"
+          type="text" // Use "text" instead of "number" to allow proper formatting
         />
 
         <TextField
@@ -479,7 +542,7 @@ const Transaction = () => {
           fullWidth
           margin="normal"
           multiline
-          rows={4}
+          rows={2}
         />
 
         <Button type="submit" variant="contained" fullWidth>

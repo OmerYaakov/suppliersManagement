@@ -26,7 +26,7 @@ const supplierSchema = mongoose.Schema({
 
   sumAmount: {
     type: Number,
-    default: 0,
+    default: 0.0,
   },
 
   notes: {
