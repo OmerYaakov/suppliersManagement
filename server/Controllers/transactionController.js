@@ -45,7 +45,9 @@ const getBySupplier = async (req, res) => {
     console.log("getting by supplier...");
     const { supplierName } = req.query;
 
-    const transacions = await trasactionModel.find({ supplierName: supplierName });
+    const transacions = await trasactionModel
+      .find({ supplierName: supplierName })
+      .sort({ transactionDate: -1 }); //// 1 for ascending, -1 for descending
 
     if (transacions.lengh === 0) {
       return res.status(404).message({ message: "there is no transaction with this supplier" });
