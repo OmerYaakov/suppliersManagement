@@ -1,18 +1,18 @@
-import { errorMessages } from "vue/compiler-sfc";
 import trasactionModel from "../Models/transactionModel.js";
 
 const createTransaction = async (req, res) => {
   console.log("creating transaction...");
-  const {
-    supplierName,
-    transactionType,
-    transactionNumber,
-    transactionAmount,
-    transactionDate,
-    receivesTransaction,
-    transactionCategory,
-    notes,
-  } = req.body;
+
+  const supplierName = req.body.supplierName;
+  const transactionType = req.body.transactionType;
+  const transactionNumber = req.body.transactionNumber;
+  const transactionAmount = req.body.transactionAmount;
+  const transactionDate = req.body.transactionDate;
+  const receivesTransaction = req.body.receivesTransaction;
+  const transactionCategory = req.body.transactionCategory;
+  const notes = req.body.notes;
+  const files = [];
+
   try {
     const exsitingTransaction = await trasactionModel.findOne({
       transactionNumber: transactionNumber,
@@ -22,15 +22,20 @@ const createTransaction = async (req, res) => {
       return res.status(409).json({ message: "transaction with this number is already exists" });
     }
 
+    req.files.forEach((file) => {
+      files.push(`/uploads/${file.originalname}`);
+    });
+
     const newTransaction = await trasactionModel.create({
-      supplierName,
-      transactionType,
-      transactionNumber,
-      transactionAmount,
-      transactionDate,
-      receivesTransaction,
-      transactionCategory,
-      notes,
+      supplierName: supplierName,
+      transactionType: transactionType,
+      transactionNumber: transactionNumber,
+      transactionAmount: transactionAmount,
+      transactionDate: transactionDate,
+      receivesTransaction: receivesTransaction,
+      transactionCategory: transactionCategory,
+      notes: notes,
+      files: files,
     });
 
     res.status(201).json(newTransaction);
