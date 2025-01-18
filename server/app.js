@@ -8,6 +8,7 @@ import supplierRoute from "./Routes/supplierRoute.js";
 import receiversRout from "./Routes/receiverTransactionRoute.js";
 import transactionCategoryRoute from "./Routes/transactionCategoryRoute.js";
 import transactionTypeRoute from "./Routes/transactionTypeRoute.js";
+import path from "path";
 
 dotenv.config();
 const app = express();
@@ -16,6 +17,7 @@ app.listen(5000, () => {
   console.log("Server is running on port 5000");
 });
 
+const uploadsPath = path.resolve(process.cwd(), `./public/uploads`);
 mongoose
   .connect("" + process.env.DB)
   .then(() => {
@@ -33,4 +35,5 @@ app.use("/supplier", supplierRoute);
 app.use("/receivers", receiversRout);
 app.use("/transactionCategory", transactionCategoryRoute);
 app.use("/transactionType", transactionTypeRoute);
+app.use("/uploads", express.static(uploadsPath + "/"));
 export default app;
