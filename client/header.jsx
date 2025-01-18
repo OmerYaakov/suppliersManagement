@@ -1,5 +1,5 @@
 import React from "react";
-import Transaction from "./src/pages.jsx/transactionPage/transaction";
+import AddTransaction from "./src/pages.jsx/addTransactionPage/addTransaction";
 import Supplier from "./src/pages.jsx/addSuppliersPage/addSuppliers";
 import SupplierLedger from "./src/pages.jsx/supplierLedgerPage/supplierLedger";
 
@@ -13,17 +13,17 @@ const header = () => {
           {/* Navbar Links */}
           <ul className="nav col-12 col-lg-auto mb-2 justify-content-center mb-md-0">
             <li>
-              <a href="/Transaction" className="nav-link px-2 text-white">
+              <a href="/AddTransaction" className="nav-link px-2 text-white">
                 הוספת עסקה
               </a>
             </li>
             <li>
-              <a href="/Supplier" className="nav-link px-2 text-white">
+              <a href="/AddSupplier" className="nav-link px-2 text-white">
                 הוספת ספק
               </a>
             </li>
             <li>
-              <a href="SupplierLedger" className="nav-link px-2 text-white">
+              <a href="/SupplierLedger" className="nav-link px-2 text-white">
                 כרטסת ספקים
               </a>
             </li>
