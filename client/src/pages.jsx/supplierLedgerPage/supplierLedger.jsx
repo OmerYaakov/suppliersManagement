@@ -1,5 +1,6 @@
 import "./supplierLedger.css";
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Table,
@@ -24,6 +25,7 @@ const SupplierLedger = () => {
   const [transactionDate, setTransactionDate] = useState("");
   const [transactionBySupplier, setTransactionBySupplier] = useState([]);
   const [sumAmountSelectedSupplier, setSumAmountSelectedSupplier] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchSuppliers();
@@ -36,7 +38,14 @@ const SupplierLedger = () => {
     setTransactionDate("");
   };
 
-  const handleRowClick = () => {};
+  const formatDate = (dateString) => {
+    const options = {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    };
+    return new Intl.DateTimeFormat("he-IL", options).format(new Date(dateString));
+  };
 
   //fetch
   const fetchSuppliers = async () => {
@@ -86,6 +95,12 @@ const SupplierLedger = () => {
     getTransactionBySupplier(supplierName);
   };
 
+  const handleRowClick = (transaction) => {
+    navigate(`/transaction/${transaction.transactionNumber}`, {
+      state: { transaction },
+    });
+  };
+
   return (
     <Box sx={{ padding: 3, margin: "0 auto" }}>
       <Box sx={{ display: "flex", justifyContent: "center", marginBottom: 3 }}>
@@ -106,12 +121,13 @@ const SupplierLedger = () => {
             ))}
           </Select>
           <h1 className="sumAmount">
-            סה"כ יתרה:
+            סה"כ יתרה :
             <h1
-              className="supplierSumAmount"
-              style={{
-                color: String(sumAmountSelectedSupplier).includes("-") ? "red" : "inherit",
-              }}>
+              className={`supplierSumAmount ${
+                String(sumAmountSelectedSupplier).includes("-")
+                  ? "supplierSumAmountNeg"
+                  : "supplierSumAmountPos"
+              }`}>
               {(Number(sumAmountSelectedSupplier) || 0).toFixed(2)} ₪
             </h1>
           </h1>
@@ -136,7 +152,7 @@ const SupplierLedger = () => {
                 hover
                 onClick={() => handleRowClick(transaction)}
                 sx={{ cursor: "pointer" }}>
-                <TableCell>{transaction.transactionDate}</TableCell>
+                <TableCell>{formatDate(transaction.transactionDate)}</TableCell>
                 <TableCell>{transaction.transactionType}</TableCell>
                 <TableCell>{transaction.transactionNumber}</TableCell>
                 <TableCell>

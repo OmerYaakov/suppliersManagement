@@ -18,7 +18,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 
-const Transaction = () => {
+const AddTransaction = () => {
   // State variables
   const [suppliers, setSuppliers] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState("");
@@ -553,4 +553,4 @@ const Transaction = () => {
   );
 };
 
-export default Transaction;
+export default AddTransaction;
