@@ -42,4 +42,74 @@ const getAllSuppliers = async (req, res) => {
 
 const getById = async (req, res) => {};
 
-export default { createSupplier, getAllSuppliers, getById };
+const updateSupplier = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { sumAmount } = req.body; // Only update the sumAmount field
+
+    const updatedSupplier = await supplierModel.findByIdAndUpdate(
+      id,
+      { $set: { sumAmount } }, // Update only the sumAmount field
+      { new: true }
+    );
+
+    if (!updatedSupplier) {
+      return res.status(404).json({ message: "Supplier not found" });
+    }
+
+    res.status(200).json(updatedSupplier);
+  } catch (error) {
+    console.error("Error updating supplier:", error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getSumAmount = async (req, res) => {
+  try {
+    console.log("Getting sumAmount...");
+
+    const { supplierName } = req.query;
+
+    // Ensure `supplierName` is provided
+    if (!supplierName) {
+      return res.status(400).json({ error: "Missing required field: supplierName" });
+    }
+
+    const supplier = await supplierModel.findOne({ supplierName }, "sumAmount");
+
+    if (supplier) {
+      res.status(200).json({ sumAmount: supplier.sumAmount });
+    } else {
+      res.status(404).json({ message: "Supplier not found" });
+    }
+  } catch (error) {
+    console.error("Error retrieving sumAmount:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const updateSupplierAmount = async (req, res) => {
+  try {
+    console.log("Updating supplier amount...");
+
+    const { filter, update } = req.body;
+
+    // Ensure `filter`, `update`, and `options` are provided
+    if (!filter || !update) {
+      return res.status(400).json({ error: "Missing required fields: filter, update, options" });
+    }
+
+    const result = await supplierModel.findOneAndUpdate(filter, update);
+
+    if (result) {
+      res.status(200).json({ message: "Supplier updated successfully", data: result });
+    } else {
+      res.status(404).json({ message: "Supplier not found" });
+    }
+  } catch (error) {
+    console.error("Error updating supplier:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export default { createSupplier, getAllSuppliers, getById, updateSupplierAmount, getSumAmount };
