@@ -39,6 +39,13 @@ const transactionSchema = mongoose.Schema({
   notes: {
     type: String,
   },
+  files: [
+    {
+      name: String,
+      url: String,
+      size: Number,
+    },
+  ],
 });
 
 const Transaction = mongoose.model("Transaction", transactionSchema);
