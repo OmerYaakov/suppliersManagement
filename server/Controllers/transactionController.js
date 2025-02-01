@@ -1,8 +1,8 @@
-import { errorMessages } from "vue/compiler-sfc";
-import trasactionModel from "../Models/transactionModel.js";
+import transactionModel from "../Models/transactionModel.js";
 
 const createTransaction = async (req, res) => {
-  console.log("creating transaction...");
+  console.log("Creating transaction...");
+
   const {
     supplierName,
     transactionType,
@@ -13,16 +13,36 @@ const createTransaction = async (req, res) => {
     transactionCategory,
     notes,
   } = req.body;
+
   try {
-    const exsitingTransaction = await trasactionModel.findOne({
-      transactionNumber: transactionNumber,
-      supplierName: supplierName,
+    const existingTransaction = await transactionModel.findOne({
+      transactionNumber,
+      supplierName,
     });
-    if (exsitingTransaction) {
-      return res.status(409).json({ message: "transaction with this number is already exists" });
+
+    if (existingTransaction) {
+      return res.status(409).json({
+        message: "Transaction with this number already exists.",
+      });
     }
 
-    const newTransaction = await trasactionModel.create({
+    // Validate number of uploaded files
+    if (req.files.length > 10) {
+      return res.status(400).json({
+        message: "You can attach up to 10 images only.",
+      });
+    }
+
+    // Map file data only if files exist
+    const files = req.files
+      ? req.files.map((file) => ({
+          name: file.originalname,
+          url: `/public/uploads/${file.originalname}`,
+          size: file.size,
+        }))
+      : [];
+
+    const newTransaction = await transactionModel.create({
       supplierName,
       transactionType,
       transactionNumber,
@@ -31,6 +51,7 @@ const createTransaction = async (req, res) => {
       receivesTransaction,
       transactionCategory,
       notes,
+      files,
     });
 
     res.status(201).json(newTransaction);
@@ -45,7 +66,7 @@ const getBySupplier = async (req, res) => {
     console.log("getting by supplier...");
     const { supplierName } = req.query;
 
-    const transacions = await trasactionModel
+    const transacions = await transactionModel
       .find({ supplierName: supplierName })
       .sort({ transactionDate: -1 }); //// 1 for ascending, -1 for descending
 
@@ -63,7 +84,7 @@ const getBySupplier = async (req, res) => {
 const getAllTransactions = async (req, res) => {
   try {
     console.log("getting all transaction... ");
-    const transactions = await trasactionModel.find();
+    const transactions = await transactionModel.find();
     res.status(200).json(transactions);
   } catch (error) {
     res.status(404).json({ message: error.message });
