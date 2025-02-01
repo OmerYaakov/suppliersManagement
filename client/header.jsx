@@ -2,8 +2,12 @@ import React from "react";
 import AddTransaction from "./src/pages.jsx/addTransactionPage/addTransaction";
 import Supplier from "./src/pages.jsx/addSuppliersPage/addSuppliers";
 import SupplierLedger from "./src/pages.jsx/supplierLedgerPage/supplierLedger";
+import { useNavigate } from "react-router-dom";
+import Login from "./src/pages.jsx/loginPage/login";
 
 const header = () => {
+  const navigate = useNavigate();
+
   return (
     <header className="p-3 text-bg-primary">
       <div className="container">
@@ -27,30 +31,33 @@ const header = () => {
                 כרטסת ספקים
               </a>
             </li>
-            <li>
+            {/* <li>
               <a href="#" className="nav-link px-2 text-white">
                 ניהול ספקים
               </a>
-            </li>
+            </li> */}
           </ul>
 
           {/* Search Bar */}
-          <form className="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+          {/* <form className="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
             <input
               type="search"
               className="form-control form-control-dark text-bg-primary"
               placeholder="Search..."
               aria-label="Search"
             />
-          </form>
+          </form> */}
 
           {/* Login and Sign-up Buttons */}
           <div className="text-end">
-            <button type="button" className="btn btn-outline-light me-2">
-              Login
+            <button
+              type="button"
+              className="btn btn-outline-light me-2"
+              onClick={() => navigate("/login")}>
+              התחברות
             </button>
-            <button type="button" className="btn btn-warning">
-              Sign-up
+            <button type="button" className="btn btn-warning" onClick={() => navigate("/register")}>
+              הרשמה
             </button>
           </div>
         </div>
