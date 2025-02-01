@@ -137,6 +137,10 @@ const AddTransaction = () => {
         formData.append("file", file);
       });
 
+      if (files.length > 10) {
+        return alert("אפשר להוסיף עד 10 תמונות. ");
+      }
+
       // Ensure transactionAmount is negative for "זיכוי"
       if (selectedTransactionType === "זיכוי") {
         if (!transactionAmount.startsWith("-")) {
@@ -569,32 +573,22 @@ const AddTransaction = () => {
         />
         <Box sx={{ marginTop: 3 }}>
           {/* File Input and Button */}
-          <label htmlFor="files">
-            <HiddenInput
-              accept="image/*,application/pdf,.doc,.docx"
-              id="files"
-              type="file"
-              onChange={handleFileChange}
-              multiple // Allow multiple files
-            />
-            <Button variant="contained" component="span">
-              בחר קבצים
-            </Button>
-          </label>
+          <Button variant="contained" component="label">
+            העלה קבצים
+            <HiddenInput type="file" multiple onChange={handleFileChange} />
+          </Button>
 
           {/* Display the list of selected file names */}
           <List>
             {files.length > 0 ? (
               files.map((file, index) => (
                 <ListItem key={index}>
-                  <Typography variant="body1">{file.name}</Typography>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    onClick={() => handleDeleteFile(index)}>
-                    X
-                  </Button>
+                  <box key={index} display="flex" alignItems="center">
+                    <Typography variant="body3">{file.name}</Typography>
+                    <IconButton onClick={() => handleDeleteFile(index)}>
+                      <CloseIcon />
+                    </IconButton>
+                  </box>
                 </ListItem>
               ))
             ) : (
