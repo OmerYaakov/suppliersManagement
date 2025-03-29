@@ -120,16 +120,18 @@ const SupplierLedger = () => {
               </MenuItem>
             ))}
           </Select>
-          <h1 className="sumAmount">
-            סה"כ יתרה :
-            <h1
-              className={`supplierSumAmount ${
-                String(sumAmountSelectedSupplier).includes("-")
-                  ? "supplierSumAmountNeg"
-                  : "supplierSumAmountPos"
-              }`}>
-              {(Number(sumAmountSelectedSupplier) || 0).toFixed(2)} ₪
-            </h1>
+          <h1>
+            <span className="sumAmount">
+              סה"כ יתרה:
+              <span
+                className={`supplierSumAmount ${
+                  String(sumAmountSelectedSupplier).includes("-")
+                    ? "supplierSumAmountNeg"
+                    : "supplierSumAmountPos"
+                }`}>
+                {(Number(sumAmountSelectedSupplier) || 0).toFixed(2)}₪
+              </span>
+            </span>
           </h1>
         </FormControl>
       </Box>
