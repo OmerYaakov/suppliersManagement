@@ -14,4 +14,7 @@ export default defineConfig({
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     },
   },
+  optimizeDeps: {
+    include: ["jwt-decode"],
+  },
 });
