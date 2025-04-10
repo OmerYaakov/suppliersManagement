@@ -1,4 +1,5 @@
 import "./App.css";
+import React from "react";
 import AddTransaction from "./pages.jsx/addTransactionPage/addTransaction";
 import AddSupplier from "./pages.jsx/addSuppliersPage/addSuppliers";
 import SupplierLedger from "./pages.jsx/supplierLedgerPage/supplierLedger";
