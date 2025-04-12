@@ -12,6 +12,13 @@ const addSupplier = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("You are not logged in.");
+      return;
+    }
+
     try {
       const newSupplier = {
         supplierName,
@@ -21,9 +28,17 @@ const addSupplier = () => {
         contactPhone,
         notes,
       };
-      console.log("creating supplier...");
-      const res = await axios.post("/supplier/create", newSupplier);
-      console.log("supplier created successfully");
+
+      console.log("Creating supplier...");
+      const res = await axios.post("/supplier/create", newSupplier, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Make sure the token is passed correctly
+        },
+      });
+
+      console.log("Supplier created successfully:", res.data);
+
+      // Reset form fields after successful creation
       setSupplierName("");
       setAddres("");
       setPhone("");
@@ -32,9 +47,15 @@ const addSupplier = () => {
       setNotes("");
     } catch (error) {
       if (error.response?.status === 409) {
-        alert("קיים ספק עם אותו שם");
+        alert("קיים ספק עם אותו שם. אנא בחר שם אחר.");
+      } else if (error.response?.status === 401) {
+        alert("שגיאה בהתחברות. אנא התחבר שוב.");
+      } else if (error.response?.status === 500) {
+        alert("שגיאה פנימית בשרת. אנא נסה שוב מאוחר יותר.");
+      } else {
+        alert("קיימת שגיאה בהוספת הספק. אנא נסה שוב.");
       }
-      console.error("Error creating supplier: ", error.response?.data || error.message);
+      console.error("Error creating supplier:", error.response?.data || error.message);
     }
   };
 

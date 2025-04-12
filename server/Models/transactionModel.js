@@ -6,6 +6,12 @@ const transactionSchema = mongoose.Schema({
     required: true,
   },
 
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // Reference to the User model
+    required: true,
+  },
+
   transactionType: {
     type: String,
     required: true,
