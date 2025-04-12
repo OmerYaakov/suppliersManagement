@@ -10,6 +10,7 @@ import transactionCategoryRoute from "./Routes/transactionCategoryRoute.js";
 import transactionTypeRoute from "./Routes/transactionTypeRoute.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import userRoute from "./Routes/userRoute.js";
 
 dotenv.config();
 const app = express();
@@ -31,13 +32,29 @@ mongoose
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  next();
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
+// app.use(cors());
 app.use("/transaction", transactionRoute);
 app.use("/supplier", supplierRoute);
 app.use("/receivers", receiversRout);
 app.use("/transactionCategory", transactionCategoryRoute);
 app.use("/transactionType", transactionTypeRoute);
 app.use("/public/uploads", express.static(path.join(__dirname, "public/uploads")));
+app.use("/user", userRoute);
 export default app;

@@ -2,15 +2,18 @@ import ReceiverTransactionModel from "../Models/receiverTransactionModel.js";
 
 const createReceiver = async (req, res) => {
   console.log("creating receiver...");
+  const userId = req.user.userId; // Get userId from the decoded token
   const { receiverName } = req.body;
   try {
     const exsitingReceiver = await ReceiverTransactionModel.findOne({
+      createdBy: userId,
       receiverName: receiverName,
     });
     if (exsitingReceiver) {
       return res.status(409).json({ message: "receiver with this name is already exist" });
     }
     const newReceiver = await ReceiverTransactionModel.create({
+      createdBy: userId,
       receiverName,
     });
 
@@ -40,9 +43,11 @@ const getByName = async (req, res) => {
 };
 
 const getAllReceivers = async (req, res) => {
+  const userId = req.user.userId; // Get userId from the decoded token
+
   try {
     console.log("getting all receivers");
-    const receivers = await ReceiverTransactionModel.find();
+    const receivers = await ReceiverTransactionModel.find({ createdBy: userId });
     res.status(200).json(receivers);
   } catch (error) {
     res.status(404).json({ message: error.massege });

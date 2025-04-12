@@ -2,12 +2,14 @@ import transactionCategory from "../Models/transactionCategoryModel.js";
 
 const createCategory = async (req, res) => {
   try {
+    const userId = req.user.userId; // Get userId from the decoded token
     console.log("Creating category ...");
 
     const { categoryName } = req.body;
 
     // Check if the category already exists
     const existingCategory = await transactionCategory.findOne({
+      createdBy: userId,
       categoryName: categoryName,
     });
 
@@ -19,6 +21,7 @@ const createCategory = async (req, res) => {
 
     // Create a new category
     const newCategory = await transactionCategory.create({
+      createdBy: userId,
       categoryName,
     });
 
@@ -30,9 +33,10 @@ const createCategory = async (req, res) => {
 };
 
 const getAllCategory = async (req, res) => {
+  const userId = req.user.userId; // Get userId from the decoded token
   try {
     console.log("getting all categories... ");
-    const categories = await transactionCategory.find();
+    const categories = await transactionCategory.find({ createdBy: userId });
     res.status(200).json(categories);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -40,13 +44,14 @@ const getAllCategory = async (req, res) => {
 };
 
 const getByCategory = async (req, res) => {
+  const userId = req.user.userId; // Get userId from the decoded token
   try {
     console.log("getting by category");
     const category = req.query;
     if (!category) {
       return res.status(400).json({ message: "Category name is required!" });
     }
-    const data = await transactionCategory.find({ categoryName: category });
+    const data = await transactionCategory.find({ createdBy: userId, categoryName: category });
     if (data.lengh === 0) {
       return res.status(400).json({ message: "No data found for the provided category" });
     }

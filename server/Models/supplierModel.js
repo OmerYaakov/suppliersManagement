@@ -32,6 +32,11 @@ const supplierSchema = mongoose.Schema({
   notes: {
     type: String,
   },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // Reference to the User model
+    required: true,
+  },
 });
 const Supplier = mongoose.model("Supplier", supplierSchema);
 export default Supplier;

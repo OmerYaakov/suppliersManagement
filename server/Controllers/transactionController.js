@@ -15,7 +15,9 @@ const createTransaction = async (req, res) => {
   } = req.body;
 
   try {
+    const userId = req.user.userId; // Get userId from the decoded token
     const existingTransaction = await transactionModel.findOne({
+      createdBy: userId,
       transactionNumber,
       supplierName,
     });
@@ -52,6 +54,7 @@ const createTransaction = async (req, res) => {
       transactionCategory,
       notes,
       files,
+      createdBy: userId, // Associate the transaction with the logged-in user
     });
 
     res.status(201).json(newTransaction);
@@ -64,10 +67,14 @@ const createTransaction = async (req, res) => {
 const getBySupplier = async (req, res) => {
   try {
     console.log("getting by supplier...");
+    const userId = req.user.userId; // Get userId from the decoded token
     const { supplierName } = req.query;
 
     const transacions = await transactionModel
-      .find({ supplierName: supplierName })
+      .find({
+        createdBy: userId, // Ensure the user is authenticated
+        supplierName: supplierName,
+      })
       .sort({ transactionDate: -1 }); //// 1 for ascending, -1 for descending
 
     if (transacions.lengh === 0) {

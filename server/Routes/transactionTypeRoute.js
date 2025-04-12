@@ -1,14 +1,15 @@
 import { Router } from "express";
 import transactionTypeController from "../Controllers/transactionTypeController.js";
+import checkAuth from "../middlewares/auth.js";
 
 const router = new Router();
 
-router.get("/get", transactionTypeController.getAllTypes);
+router.get("/get", checkAuth, transactionTypeController.getAllTypes);
 
-router.get("/getByType", transactionTypeController.getByType);
+router.get("/getByType", checkAuth, transactionTypeController.getByType);
 
-router.post("/create", transactionTypeController.createType);
+router.post("/create", checkAuth, transactionTypeController.createType);
 
-router.delete("/delete/:id", transactionTypeController.deleteType);
+router.delete("/delete/:id", checkAuth, transactionTypeController.deleteType);
 
 export default router;

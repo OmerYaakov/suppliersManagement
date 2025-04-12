@@ -1,14 +1,15 @@
 import { Router } from "express";
 import receiverTransactionController from "../Controllers/receiverTransacionController.js";
+import checkAuth from "../middlewares/auth.js";
 
 const router = new Router();
 
-router.get("/get", receiverTransactionController.getAllReceivers);
+router.get("/get", checkAuth, receiverTransactionController.getAllReceivers);
 
-router.get("/getByName", receiverTransactionController.getByName);
+router.get("/getByName", checkAuth, receiverTransactionController.getByName);
 
-router.post("/create", receiverTransactionController.createReceiver);
+router.post("/create", checkAuth, receiverTransactionController.createReceiver);
 
-router.delete("/delete/:id", receiverTransactionController.deleteReceiver);
+router.delete("/delete/:id", checkAuth, receiverTransactionController.deleteReceiver);
 
 export default router;

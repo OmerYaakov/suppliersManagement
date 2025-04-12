@@ -109,6 +109,7 @@ const TransactionPage = () => {
                   return (
                     <Grid item xs={4} key={index}>
                       <img
+                        crossOrigin="anonymous"
                         src={`${baseURL}${file.name}`}
                         alt={file.name}
                         onClick={() => handleImageOpen(`${baseURL}${file.name}`)}
@@ -129,6 +130,7 @@ const TransactionPage = () => {
         <Dialog open={!!openImage} onClose={handleImageClose} maxWidth="md" fullWidth>
           {openImage && (
             <img
+              crossOrigin="anonymous"
               src={openImage}
               alt="Full size"
               style={{

@@ -1,8 +1,11 @@
 import "./App.css";
+import React from "react";
 import AddTransaction from "./pages.jsx/addTransactionPage/addTransaction";
 import AddSupplier from "./pages.jsx/addSuppliersPage/addSuppliers";
 import SupplierLedger from "./pages.jsx/supplierLedgerPage/supplierLedger";
 import TransactionPage from "./pages.jsx/transactionPage/transactionPage";
+import Login from "./pages.jsx/loginPage/login";
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 axios.defaults.baseURL = "http://localhost:5000/";
@@ -18,6 +21,8 @@ function App() {
           <Route path="/addSupplier" element={<AddSupplier />} />
           <Route path="/supplierLedger" element={<SupplierLedger />} />
           <Route path="/" element={<SupplierLedger />} />
+          <Route path="/login" element={<Login />} />
+
           <Route path="/transaction/:transactionNumber" element={<TransactionPage />} />
         </Routes>
       </BrowserRouter>

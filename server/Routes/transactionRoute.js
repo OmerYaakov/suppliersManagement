@@ -2,6 +2,7 @@ import Router from "express";
 import transactionController from "../Controllers/transactionController.js";
 import multer from "multer";
 import path from "path";
+import checkAuth from "../middlewares/auth.js";
 
 const router = new Router();
 
@@ -16,14 +17,19 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.get("/get", transactionController.getAllTransactions);
+router.get("/get", checkAuth, transactionController.getAllTransactions);
 
-router.get("/getBySupplier", transactionController.getBySupplier);
+router.get("/getBySupplier", checkAuth, transactionController.getBySupplier);
 
-router.get("/get/:_id", transactionController.getById);
+router.get("/get/:_id", checkAuth, transactionController.getById);
 
-router.get("get/:date", transactionController.getByDate);
+router.get("get/:date", checkAuth, transactionController.getByDate);
 
-router.post("/create", upload.array("file", 10), transactionController.createTransaction);
+router.post(
+  "/create",
+  upload.array("file", 10),
+  checkAuth,
+  transactionController.createTransaction
+);
 
 export default router;
