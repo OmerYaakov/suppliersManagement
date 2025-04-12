@@ -26,6 +26,7 @@ const SupplierLedger = () => {
   const [transactionBySupplier, setTransactionBySupplier] = useState([]);
   const [sumAmountSelectedSupplier, setSumAmountSelectedSupplier] = useState("");
   const navigate = useNavigate();
+  const token = localStorage.getItem("token"); // Get the token from localStorage
 
   useEffect(() => {
     fetchSuppliers();
@@ -49,25 +50,41 @@ const SupplierLedger = () => {
 
   //fetch
   const fetchSuppliers = async () => {
+    if (!token) {
+      console.log("No token found, redirecting to login...");
+      // Optionally redirect to the login page if the token is not found
+      window.location.href = "/login"; // or use navigate() for React Router
+      return;
+    }
+
     try {
-      const res = await axios.get("/supplier/get");
-      if (Array.isArray(res.data)) {
-        setSuppliers(res.data);
-      } else {
-        setSuppliers([]);
-      }
+      const response = await axios.get("/supplier/get", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+        },
+      });
+      console.log("Suppliers fetched:", response.data);
+      setSuppliers(response.data);
     } catch (error) {
-      console.error("Error fetching suppliers:", error);
+      console.error("Error fetching suppliers:", error.response);
+      if (error.response && error.response.status === 401) {
+        // Token expired or invalid, redirect to login page
+        window.location.href = "/login"; // or use navigate() for React Router
+      }
     }
   };
-
   //get transaction by supplier
   const getTransactionBySupplier = async (supplierName) => {
     try {
       console.log("get transaction by supplier....");
 
       // Fetch transactions by supplier
-      const res = await axios.get(`/transaction/getBySupplier/`, { params: { supplierName } });
+      const res = await axios.get(`/transaction/getBySupplier/`, {
+        params: { supplierName },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+        },
+      });
       if (Array.isArray(res.data)) {
         setTransactionBySupplier(res.data);
       } else {
@@ -76,6 +93,9 @@ const SupplierLedger = () => {
 
       const resAmount = await axios.get(`/supplier/getSupplierAmount`, {
         params: { supplierName },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (resAmount.data && typeof resAmount.data.sumAmount === "number") {
         setSumAmountSelectedSupplier(resAmount.data.sumAmount);
@@ -120,16 +140,18 @@ const SupplierLedger = () => {
               </MenuItem>
             ))}
           </Select>
-          <h1 className="sumAmount">
-            סה"כ יתרה :
-            <h1
-              className={`supplierSumAmount ${
-                String(sumAmountSelectedSupplier).includes("-")
-                  ? "supplierSumAmountNeg"
-                  : "supplierSumAmountPos"
-              }`}>
-              {(Number(sumAmountSelectedSupplier) || 0).toFixed(2)} ₪
-            </h1>
+          <h1>
+            <span className="sumAmount">
+              סה"כ יתרה:
+              <span
+                className={`supplierSumAmount ${
+                  String(sumAmountSelectedSupplier).includes("-")
+                    ? "supplierSumAmountNeg"
+                    : "supplierSumAmountPos"
+                }`}>
+                {(Number(sumAmountSelectedSupplier) || 0).toFixed(2)}₪
+              </span>
+            </span>
           </h1>
         </FormControl>
       </Box>
