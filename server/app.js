@@ -10,6 +10,7 @@ import transactionCategoryRoute from "./Routes/transactionCategoryRoute.js";
 import transactionTypeRoute from "./Routes/transactionTypeRoute.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import userRoute from "./Routes/userRoute.js";
 
 dotenv.config();
 const app = express();
@@ -35,6 +36,7 @@ app.use(
   cors({
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use((req, res, next) => {
@@ -54,4 +56,5 @@ app.use("/receivers", receiversRout);
 app.use("/transactionCategory", transactionCategoryRoute);
 app.use("/transactionType", transactionTypeRoute);
 app.use("/public/uploads", express.static(path.join(__dirname, "public/uploads")));
+app.use("/user", userRoute);
 export default app;
