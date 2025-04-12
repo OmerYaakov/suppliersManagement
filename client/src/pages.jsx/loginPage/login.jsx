@@ -3,11 +3,12 @@ import { Box, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import jwt_decode from "jwt-decode"; // Correct import
+import axios from "axios"; // For sending requests to your backend
 
 const Login = () => {
   const navigate = useNavigate();
 
-  const onSuccess = (res) => {
+  const onSuccess = async (res) => {
     const user = res;
     console.log("Login Success: currentUser:", user);
 
@@ -15,16 +16,24 @@ const Login = () => {
     const decodedToken = jwt_decode(user.credential);
     console.log("Decoded Token:", decodedToken);
 
-    const profile = {
-      token: user, // The token (JWT) returned by Google
-    };
+    // Send the token to your backend to validate it and get the app JWT token
+    try {
+      const response = await axios.post("/user/login", {
+        token: user.credential, // Send the Google token to your backend
+      });
 
-    // Store profile information in localStorage
-    localStorage.setItem("profile", JSON.stringify(profile));
+      // On successful login, the backend will return the app's JWT token and user data
+      const { token, userData } = response.data;
 
-    localStorage.setItem("token", user.credential); // Store the token
+      // Store the JWT token and user profile information in localStorage
+      localStorage.setItem("profile", JSON.stringify(userData)); // Store user profile
+      localStorage.setItem("token", token); // Store JWT token for your app
 
-    navigate("/");
+      // Redirect to the home page or any other page after successful login
+      navigate("/"); // Redirect to the homepage
+    } catch (err) {
+      console.log("Error during login with backend:", err);
+    }
   };
 
   const onFailure = (res) => {
@@ -36,12 +45,12 @@ const Login = () => {
       <Box sx={{ mt: 5 }}>
         <Box sx={{ mt: 2 }}>
           <GoogleLogin
-            clientId={import.meta.env.VITE_APP_GOOGLE_CLIENT_ID}
+            clientId={import.meta.env.VITE_APP_GOOGLE_CLIENT_ID} // Your Google client ID
             buttonText="Login with Google"
-            onSuccess={onSuccess}
-            onFailure={onFailure}
+            onSuccess={onSuccess} // Callback for successful login
+            onFailure={onFailure} // Callback for login failure
             cookiePolicy={"single_host_origin"}
-            isSignedIn={true}
+            isSignedIn={true} // Automatically sign the user in
           />
         </Box>
       </Box>

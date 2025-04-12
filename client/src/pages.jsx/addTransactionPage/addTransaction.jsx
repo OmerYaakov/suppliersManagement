@@ -65,7 +65,11 @@ const AddTransaction = () => {
 
   const fetchSuppliers = async () => {
     try {
-      const res = await axios.get("/supplier/get");
+      const res = await axios.get("/supplier/get", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+        },
+      });
       if (Array.isArray(res.data)) {
         setSuppliers(res.data);
       } else {
@@ -78,7 +82,11 @@ const AddTransaction = () => {
 
   const fetchReceivers = async () => {
     try {
-      const res = await axios.get("/receivers/get");
+      const res = await axios.get("/receivers/get", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+        },
+      });
       if (Array.isArray(res.data)) {
         setReceivers(res.data);
       } else {
@@ -91,7 +99,11 @@ const AddTransaction = () => {
 
   const fetchCategory = async () => {
     try {
-      const res = await axios.get("/transactionCategory/get");
+      const res = await axios.get("/transactionCategory/get", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+        },
+      });
       if (Array.isArray(res.data)) {
         setTransactionCategories(res.data);
       } else {
@@ -104,7 +116,11 @@ const AddTransaction = () => {
 
   const fetchTypes = async () => {
     try {
-      const res = await axios.get("/transactionType/get");
+      const res = await axios.get("/transactionType/get", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+        },
+      });
       if (Array.isArray(res.data)) {
         setTransactionTypes(res.data);
       } else {
@@ -150,7 +166,11 @@ const AddTransaction = () => {
 
       // Create the new transaction
 
-      const transactionResponse = await axios.post("./transaction/create", formData);
+      const transactionResponse = await axios.post("./transaction/create", formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+        },
+      });
       console.log("Transaction created successfully:", transactionResponse.data);
 
       // Update the supplier amount
@@ -179,7 +199,15 @@ const AddTransaction = () => {
 
   const handleAddReceiver = async () => {
     try {
-      const res = await axios.post("/receivers/create", { receiverName: newReceiver });
+      const res = await axios.post(
+        "/receivers/create",
+        { receiverName: newReceiver },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+          },
+        }
+      );
       setReceivers((prev) => [...prev, res.data]); // Update receivers list
       setSelectedReceiver(newReceiver); // Set the newly added receiver
       setNewReceiver(""); // Clear input
@@ -191,7 +219,11 @@ const AddTransaction = () => {
 
   const handleRemoveReceiver = async (receiverId) => {
     try {
-      await axios.delete(`/receivers/delete/${receiverId}`);
+      await axios.delete(`/receivers/delete/${receiverId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+        },
+      });
       setReceivers((prev) => prev.filter((receiver) => receiver._id !== receiverId));
       if (selectedReceiver === receiverId) {
         setSelectedReceiver("");
@@ -215,6 +247,9 @@ const AddTransaction = () => {
       // Fetch the current supplier amount
       const { data: supplierData } = await axios.get("/supplier/getSupplierAmount/", {
         params: { supplierName: selectedSupplier },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+        },
       });
 
       const currentAmount = supplierData?.sumAmount || 0; // Ensure we have a default value if no amount exists
@@ -228,10 +263,18 @@ const AddTransaction = () => {
       }
 
       // Update the supplier amount in the database
-      const response = await axios.post("/supplier/updateAmount", {
-        filter: { supplierName: selectedSupplier },
-        update: { $set: { sumAmount: newAmount } },
-      });
+      const response = await axios.post(
+        "/supplier/updateAmount",
+        {
+          filter: { supplierName: selectedSupplier },
+          update: { $set: { sumAmount: newAmount } },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+          },
+        }
+      );
 
       console.log("Updated supplier document:", response.data);
       return response.data;
@@ -244,7 +287,15 @@ const AddTransaction = () => {
 
   const handleAddCategory = async () => {
     try {
-      const res = await axios.post("/transactionCategory/create", { categoryName: newCategory });
+      const res = await axios.post(
+        "/transactionCategory/create",
+        { categoryName: newCategory },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+          },
+        }
+      );
       setTransactionCategories((prev) => [...prev, res.data]); // Update categories list
       setSelectedTransactionCategory(newCategory); // Set the newly added category
       setNewCategory(""); // Clear input
@@ -264,7 +315,11 @@ const AddTransaction = () => {
 
   const handleRemoveCategory = async (categoryId) => {
     try {
-      await axios.delete(`/transactionCategory/delete/${categoryId}`);
+      await axios.delete(`/transactionCategory/delete/${categoryId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+        },
+      });
       setTransactionCategories((prev) => prev.filter((category) => category._id != categoryId));
       if (selectedTransactionCategory === categoryId) {
         setSelectedTransactionCategory("");
@@ -278,22 +333,42 @@ const AddTransaction = () => {
 
   const handleAddType = async () => {
     try {
-      const res = await axios.post("/transactionType/create", { typeName: newType });
+      const res = await axios.post(
+        "/transactionType/create", // The API endpoint
+        {
+          typeName: newType, // The data being sent in the body
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Send the token in the Authorization header
+          },
+        }
+      );
+
+      // Update state with the newly added transaction type
       setTransactionTypes((prev) => [...prev, res.data]);
       setSelectedTransactionType(res.data.typeName);
-      setNewType("");
-      setOpenAddTypeDialog(false);
+      setNewType(""); // Reset the input field
+      setOpenAddTypeDialog(false); // Close the dialog
     } catch (error) {
+      // Handle different error responses
       if (error.response?.status === 409) {
-        alert("קיימת סוג עסקה עם אותו שם.");
+        alert("קיימת סוג עסקה עם אותו שם."); // Conflict: Type with the same name exists
+      } else if (error.response?.status === 500) {
+        alert("שגיאה בשרת. אנא נסה שוב מאוחר יותר."); // Internal Server Error: Server error
+      } else {
+        alert("שגיאה לא ידועה. אנא נסה שוב מאוחר יותר."); // Unknown error
       }
-      console.error("Error adding new type: ", error);
     }
   };
 
   const handleRemoveType = async (typeId) => {
     try {
-      axios.delete(`/transactionType/delete/${typeId}`);
+      axios.delete(`/transactionType/delete/${typeId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
+        },
+      });
       setTransactionTypes((prev) => prev.filter((type) => type._id != typeId));
       if (selectedTransactionType === typeId) {
         setSelectedTransactionType("");
@@ -571,7 +646,7 @@ const AddTransaction = () => {
           multiline
           rows={2}
         />
-        <Box sx={{ marginTop: 3 }}>
+        <Box sx={{ marginTop: 3, display: "flex", flexDirection: "column" }}>
           {/* File Input and Button */}
           <Button variant="contained" component="label">
             העלה קבצים
@@ -579,7 +654,7 @@ const AddTransaction = () => {
           </Button>
 
           {/* Display the list of selected file names */}
-          <List>
+          <List sx={{ marginTop: 2, maxHeight: 200, overflowY: "auto" }}>
             {files.length > 0 ? (
               files.map((file, index) => (
                 <ListItem key={index}>
