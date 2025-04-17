@@ -1,0 +1,24 @@
+services:
+  client:
+    build: ./client
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+    networks:
+      - my-network
+
+  server:
+    build: ./server
+    ports:
+      - "5000:5000"
+    environment:
+      # MongoDB Atlas connection string (replace <your-atlas-uri> with your actual MongoDB URI)
+      #- MONGODB_URI=mongodb+srv://omeryaakov2:F59a7b4fa3@suppliersmanagment.pmucill.mongodb.net/?retryWrites=true&w=majority&appName=SuppliersManagment
+      monfongo_uri: mongodb://mongo:27017/suppliersmanagment
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge

@@ -6,7 +6,8 @@ dotenv.config();
 
 export default defineConfig({
   server: {
-    port: process.env.VITE_PORT || 5173, // This sets the port to either the value in .env or defaults to 5173
+    port: 5173, // Ensure Vite uses port 5173 explicitly
+    host: "0.0.0.0", // Expose on all network interfaces for Docker compatibility
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
       "Cross-Origin-Embedder-Policy": "require-corp",
