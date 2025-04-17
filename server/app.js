@@ -21,12 +21,12 @@ app.listen(5000, () => {
 
 const uploadsPath = path.resolve(process.cwd(), `./public/uploads`);
 mongoose
-  .connect("" + process.env.DB)
+  .connect(process.env.db)
   .then(() => {
-    console.log("Database connected: " + process.env.DB);
+    console.log("Database connected: " + process.env.db); // Log successful connection
   })
   .catch((err) => {
-    console.log("Error: ", err);
+    console.log("Error: ", err); // Log connection error
   });
 
 const __filename = fileURLToPath(import.meta.url);
@@ -56,5 +56,6 @@ app.use("/receivers", receiversRout);
 app.use("/transactionCategory", transactionCategoryRoute);
 app.use("/transactionType", transactionTypeRoute);
 app.use("/public/uploads", express.static(path.join(__dirname, "public/uploads")));
+
 app.use("/user", userRoute);
 export default app;
