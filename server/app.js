@@ -14,6 +14,9 @@ import userRoute from "./Routes/userRoute.js";
 
 dotenv.config();
 const app = express();
+if (process.env.NODE_ENV === "production") {
+  console.log = function () {}; // Disable all console.log in production
+}
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
@@ -21,9 +24,9 @@ app.listen(5000, () => {
 
 const uploadsPath = path.resolve(process.cwd(), `./public/uploads`);
 mongoose
-  .connect(process.env.db)
+  .connect(process.env.DB_ATLAS)
   .then(() => {
-    console.log("Database connected: " + process.env.db); // Log successful connection
+    console.log("Database connected: " + process.env.DB_ATLAS); // Log successful connection
   })
   .catch((err) => {
     console.log("Error: ", err); // Log connection error
