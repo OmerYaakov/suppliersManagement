@@ -11,6 +11,7 @@ import transactionTypeRoute from "./Routes/transactionTypeRoute.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import userRoute from "./Routes/userRoute.js";
+import AWS from "aws-sdk";
 
 dotenv.config();
 const app = express();
