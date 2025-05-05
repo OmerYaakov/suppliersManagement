@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.802.0",
     "aws-sdk": "^2.1692.0",
     "cross-env": "^7.0.3",
     "multer": "^1.4.5-lts.1",
