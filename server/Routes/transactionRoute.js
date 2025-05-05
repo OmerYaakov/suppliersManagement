@@ -18,8 +18,6 @@ const router = new Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-const upload = multer({ storage });
-
 router.get("/get", checkAuth, transactionController.getAllTransactions);
 
 router.get("/getBySupplier", checkAuth, transactionController.getBySupplier);
