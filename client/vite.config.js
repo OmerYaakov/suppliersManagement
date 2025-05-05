@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import dotenv from "dotenv";
+import react from "@vitejs/plugin-react";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -27,5 +28,15 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["jwt-decode"],
+  },
+  plugins: [react()],
+  build: {
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress warnings related to 'use client' directives
+        if (warning.code === "MODULE_LEVEL_DIRECTIVE") return;
+        warn(warning);
+      },
+    },
   },
 });
