@@ -22,6 +22,14 @@ app.listen(5000, () => {
   console.log("Server is running on port 5000");
 });
 
+// S3 Configuration
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
+export const s3 = new AWS.S3(); // Export for use in routes/controllers
+
 const uploadsPath = path.resolve(process.cwd(), `./public/uploads`);
 mongoose
   .connect(process.env.DB_ATLAS)
@@ -53,12 +61,12 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(cors());
-app.use("/transaction", transactionRoute);
-app.use("/supplier", supplierRoute);
-app.use("/receivers", receiversRout);
-app.use("/transactionCategory", transactionCategoryRoute);
-app.use("/transactionType", transactionTypeRoute);
-app.use("/public/uploads", express.static(path.join(__dirname, "public/uploads")));
+app.use("/api/transaction", transactionRoute);
+app.use("/api/supplier", supplierRoute);
+app.use("/api/receivers", receiversRout);
+app.use("/api/transactionCategory", transactionCategoryRoute);
+app.use("/api/transactionType", transactionTypeRoute);
+app.use("/api/public/uploads", express.static(path.join(__dirname, "public/uploads")));
 
-app.use("/user", userRoute);
+app.use("/api/user", userRoute);
 export default app;

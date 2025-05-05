@@ -3,8 +3,8 @@ version: "3.8"
 services:
   client:
     build: ./client
-    expose:
-      - "5173" # Only expose internally, NGINX will forward external traffic
+    ports:
+      - "5173:5173"
     depends_on:
       - server
     networks:
@@ -12,14 +12,26 @@ services:
 
   server:
     build: ./server
-    expose:
-      - "5000" # Only expose internally
+    env_file:
+      - ./server/.env
+    ports:
+      - "5000:5000"
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=${DB_ATLAS}
-      - JWT_SECRET=${JWT_SECRET}
     networks:
       - my-network
+
+  # Optional: Enable NGINX if you're reverse proxying
+  # nginx:
+  #   image: nginx:latest
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf
+  #   ports:
+  #     - "80:80"
+  #   depends_on:
+  #     - server
+  #   networks:
+  #     - my-network
 
 networks:
   my-network:

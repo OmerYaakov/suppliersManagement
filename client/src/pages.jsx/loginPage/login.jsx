@@ -45,12 +45,8 @@ const Login = () => {
       <Box sx={{ mt: 5 }}>
         <Box sx={{ mt: 2 }}>
           <GoogleLogin
-            clientId={import.meta.env.VITE_APP_GOOGLE_CLIENT_ID} // Your Google client ID
-            buttonText="Login with Google"
             onSuccess={onSuccess} // Callback for successful login
             onFailure={onFailure} // Callback for login failure
-            cookiePolicy={"single_host_origin"}
-            isSignedIn={true} // Automatically sign the user in
           />
         </Box>
       </Box>
