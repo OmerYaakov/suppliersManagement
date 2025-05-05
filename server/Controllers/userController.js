@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const loginWithGoogle = async (req, res) => {
-  const { token } = req.body;
+  const token = req.body.credential || req.body.token;
 
   try {
     // Verify the Google token using Google API
