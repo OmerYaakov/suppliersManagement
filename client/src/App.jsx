@@ -8,7 +8,7 @@ import Login from "./pages.jsx/loginPage/login";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
-axios.defaults.baseURL = "http://localhost:5000/";
+axios.defaults.baseURL = "/api/";
 import Header from "../header";
 import "bootstrap/dist/css/bootstrap.min.css";
 function App() {
