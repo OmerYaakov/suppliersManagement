@@ -6,14 +6,17 @@ import checkAuth from "../middlewares/auth.js";
 
 const router = new Router();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    return cb(null, path.resolve(process.cwd(), "./public/uploads"));
-  },
-  filename: (req, file, cb) => {
-    return cb(null, file.originalname);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     return cb(null, path.resolve(process.cwd(), "./public/uploads"));
+//   },
+//   filename: (req, file, cb) => {
+//     return cb(null, file.originalname);
+//   },
+// });
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 const upload = multer({ storage });
 

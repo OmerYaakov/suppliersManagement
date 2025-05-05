@@ -1,4 +1,11 @@
 import transactionModel from "../Models/transactionModel.js";
+import AWS from "aws-sdk";
+
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
 
 const createTransaction = async (req, res) => {
   console.log("Creating transaction...");
@@ -15,7 +22,8 @@ const createTransaction = async (req, res) => {
   } = req.body;
 
   try {
-    const userId = req.user.userId; // Get userId from the decoded token
+    const userId = req.user.userId;
+
     const existingTransaction = await transactionModel.findOne({
       createdBy: userId,
       transactionNumber,
@@ -28,21 +36,29 @@ const createTransaction = async (req, res) => {
       });
     }
 
-    // Validate number of uploaded files
     if (req.files.length > 10) {
-      return res.status(400).json({
-        message: "You can attach up to 10 images only.",
-      });
+      return res.status(400).json({ message: "You can attach up to 10 images only." });
     }
 
-    // Map file data only if files exist
-    const files = req.files
-      ? req.files.map((file) => ({
-          name: file.originalname,
-          url: `/public/uploads/${file.originalname}`,
-          size: file.size,
-        }))
-      : [];
+    const uploadPromises = req.files.map((file) => {
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `${Date.now()}-${file.originalname}`,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+        ACL: "public-read",
+      };
+
+      return s3.upload(params).promise();
+    });
+
+    const uploadedFiles = await Promise.all(uploadPromises);
+
+    const files = uploadedFiles.map((file) => ({
+      name: file.Key,
+      url: file.Location,
+      size: file.ContentLength || 0,
+    }));
 
     const newTransaction = await transactionModel.create({
       supplierName,
@@ -54,7 +70,7 @@ const createTransaction = async (req, res) => {
       transactionCategory,
       notes,
       files,
-      createdBy: userId, // Associate the transaction with the logged-in user
+      createdBy: userId,
     });
 
     res.status(201).json(newTransaction);
