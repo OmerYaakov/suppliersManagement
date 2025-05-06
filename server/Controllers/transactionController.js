@@ -9,78 +9,6 @@ const s3 = new AWS.S3({
   region: process.env.AWS_REGION,
 });
 
-// const createTransaction = async (req, res) => {
-//   console.log("Creating transaction...");
-
-//   const {
-//     supplierName,
-//     transactionType,
-//     transactionNumber,
-//     transactionAmount,
-//     transactionDate,
-//     receivesTransaction,
-//     transactionCategory,
-//     notes,
-//   } = req.body;
-
-//   try {
-//     const userId = req.user.userId;
-
-//     const existingTransaction = await transactionModel.findOne({
-//       createdBy: userId,
-//       transactionNumber,
-//       supplierName,
-//     });
-
-//     if (existingTransaction) {
-//       return res.status(409).json({
-//         message: "Transaction with this number already exists.",
-//       });
-//     }
-
-//     if (req.files.length > 10) {
-//       return res.status(400).json({ message: "You can attach up to 10 images only." });
-//     }
-
-//     const uploadPromises = req.files.map((file) => {
-//       const params = {
-//         Bucket: process.env.AWS_BUCKET_NAME,
-//         Key: `${Date.now()}-${file.originalname}`,
-//         Body: file.buffer,
-//         ContentType: file.mimetype,
-//       };
-
-//       return s3.upload(params).promise();
-//     });
-
-//     const uploadedFiles = await Promise.all(uploadPromises);
-
-//     const files = uploadedFiles.map((file) => ({
-//       name: file.Key,
-//       url: file.Location,
-//       size: file.ContentLength || 0,
-//     }));
-
-//     const newTransaction = await transactionModel.create({
-//       supplierName,
-//       transactionType,
-//       transactionNumber,
-//       transactionAmount,
-//       transactionDate,
-//       receivesTransaction,
-//       transactionCategory,
-//       notes,
-//       files,
-//       createdBy: userId,
-//     });
-
-//     res.status(201).json(newTransaction);
-//   } catch (error) {
-//     console.error("Error creating transaction: ", error.message);
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
 const createTransaction = async (req, res) => {
   console.log("Creating transaction...");
 
@@ -96,13 +24,17 @@ const createTransaction = async (req, res) => {
   } = req.body;
 
   try {
+    const existingTransaction = false;
     const userId = req.user.userId;
-
-    const existingTransaction = await transactionModel.findOne({
-      createdBy: userId,
-      transactionNumber,
-      supplierName,
-    });
+    // Check if the user is authenticated
+    if (!transactionNumber === 0 && !transactionType === "קבלה") {
+      existingTransaction = await transactionModel.findOne({
+        createdBy: userId,
+        transactionNumber,
+        transactionType,
+        supplierName,
+      });
+    }
 
     if (existingTransaction) {
       return res.status(409).json({
