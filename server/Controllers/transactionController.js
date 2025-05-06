@@ -1,6 +1,7 @@
 import transactionModel from "../Models/transactionModel.js";
 import AWS from "aws-sdk";
 import path from "path";
+import heicConvert from "heic-convert";
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -113,7 +114,7 @@ const createTransaction = async (req, res) => {
       return res.status(400).json({ message: "You can attach up to 10 images only." });
     }
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/heic"];
     for (let file of req.files) {
       if (!allowedTypes.includes(file.mimetype)) {
         return res.status(400).json({ message: `Unsupported file type: ${file.mimetype}` });
@@ -121,7 +122,7 @@ const createTransaction = async (req, res) => {
     }
 
     // ✅ Validate image extensions
-    const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
+    const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".heic"];
     for (let file of req.files) {
       const ext = path.extname(file.originalname).toLowerCase();
       if (!validExtensions.includes(ext)) {
@@ -129,15 +130,31 @@ const createTransaction = async (req, res) => {
       }
     }
 
-    // ✅ Upload files to S3
-    const uploadPromises = req.files.map((file) => {
-      const safeFilename = `${Date.now()}-${file.originalname.replace(/\s+/g, "_")}`;
+    const uploadPromises = req.files.map(async (file) => {
+      let buffer = file.buffer;
+      let extension = path.extname(file.originalname).toLowerCase();
+      let contentType = file.mimetype;
+      let safeFilename = `${Date.now()}-${file.originalname.replace(/\s+/g, "_")}`;
+
+      if (file.mimetype === "image/heic" || extension === ".heic") {
+        console.log("Converting HEIC image...");
+        buffer = await heicConvert({
+          buffer: file.buffer,
+          format: "JPEG",
+          quality: 1,
+        });
+        extension = ".jpg";
+        contentType = "image/jpeg";
+        safeFilename = safeFilename.replace(/\.heic/i, ".jpg");
+      }
+
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: safeFilename,
-        Body: file.buffer,
-        ContentType: file.mimetype,
+        Body: buffer,
+        ContentType: contentType,
       };
+
       return s3.upload(params).promise();
     });
 
