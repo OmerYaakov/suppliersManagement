@@ -24,12 +24,12 @@ router.get("/getBySupplier", checkAuth, transactionController.getBySupplier);
 
 router.get("/get/:_id", checkAuth, transactionController.getById);
 
-router.get("get/:date", checkAuth, transactionController.getByDate);
+router.get("/get/date/:date", checkAuth, transactionController.getByDate);
 
 router.post(
   "/create",
-  upload.array("file", 10),
   checkAuth,
+  upload.array("file", 10),
   transactionController.createTransaction
 );
 
