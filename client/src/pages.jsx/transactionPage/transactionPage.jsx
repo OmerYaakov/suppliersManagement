@@ -110,9 +110,9 @@ const TransactionPage = () => {
                     <Grid item xs={4} key={index}>
                       <img
                         crossOrigin="anonymous"
-                        src={`${baseURL}${file.name}`}
+                        src={file.url}
                         alt={file.name}
-                        onClick={() => handleImageOpen(`${baseURL}${file.name}`)}
+                        onClick={() => handleImageOpen(file.url)}
                         style={{
                           width: "100%",
                           height: "150px",
