@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === "production") {
   console.log = function () {}; // Disable all console.log in production
 }
 
-app.listen(5000, () => {
+app.listen(5000, "0.0.0.0", () => {
   console.log("Server is running on port 5000");
 });
 
