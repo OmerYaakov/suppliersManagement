@@ -21,10 +21,7 @@ const TransactionPage = () => {
 
   const isImageFile = (filename) => {
     if (!filename) return false;
-    const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
-    return imageExtensions.some(
-      (ext) => typeof filename === "string" && filename.toLowerCase().endsWith(ext)
-    );
+    return /\.(jpe?g|png|gif|bmp|webp)$/i.test(filename.split("?")[0]);
   };
 
   const handleImageOpen = (imageUrl) => {
