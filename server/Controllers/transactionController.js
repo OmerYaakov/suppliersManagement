@@ -46,7 +46,6 @@ const createTransaction = async (req, res) => {
         Key: `${Date.now()}-${file.originalname}`,
         Body: file.buffer,
         ContentType: file.mimetype,
-        ACL: "public-read",
       };
 
       return s3.upload(params).promise();
