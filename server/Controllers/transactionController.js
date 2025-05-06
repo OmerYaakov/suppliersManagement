@@ -1,5 +1,6 @@
 import transactionModel from "../Models/transactionModel.js";
 import AWS from "aws-sdk";
+import path from "path";
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -78,8 +79,6 @@ const s3 = new AWS.S3({
 //     res.status(500).json({ message: error.message });
 //   }
 // };
-
-const path = require("path"); // Make sure this is at the top of your file
 
 const createTransaction = async (req, res) => {
   console.log("Creating transaction...");
