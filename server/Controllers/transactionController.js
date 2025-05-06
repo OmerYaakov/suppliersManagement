@@ -152,8 +152,43 @@ const getAllTransactions = async (req, res) => {
   }
 };
 
+const updateTransactionNumber = async (req, res) => {
+  const { _id } = req.params;
+  const { newTransactionNumber } = req.body;
+
+  try {
+    // Check if another transaction already has this number
+    const existing = await transactionModel.findOne({
+      transactionNumber: newTransactionNumber,
+      _id: { $ne: _id }, // exclude the current transaction
+    });
+
+    if (existing) {
+      return res.status(409).json({ message: "מספר עסקה כבר קיים" });
+    }
+
+    const updated = await transactionModel.findByIdAndUpdate(
+      _id,
+      { transactionNumber: newTransactionNumber },
+      { new: true }
+    );
+
+    res.status(200).json(updated);
+  } catch (error) {
+    console.error("Update failed", error.message);
+    res.status(500).json({ message: "שגיאה בעדכון מספר העסקה" });
+  }
+};
+
 const getById = async (req, res) => {};
 
 const getByDate = async (req, res) => {};
 
-export default { createTransaction, getAllTransactions, getBySupplier, getById, getByDate };
+export default {
+  createTransaction,
+  getAllTransactions,
+  getBySupplier,
+  getById,
+  getByDate,
+  updateTransactionNumber,
+};

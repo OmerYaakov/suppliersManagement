@@ -29,6 +29,13 @@ router.get("/get/:_id", checkAuth, transactionController.getById);
 
 router.get("/get/date/:date", checkAuth, transactionController.getByDate);
 
+//update transaction number
+router.patch(
+  "/updateTransactionNumber/:_id",
+  checkAuth,
+  transactionController.updateTransactionNumber
+);
+
 router.post(
   "/create",
   checkAuth,
