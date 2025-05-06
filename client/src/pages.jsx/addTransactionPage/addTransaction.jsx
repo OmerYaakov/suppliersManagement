@@ -164,6 +164,10 @@ const AddTransaction = () => {
         }
       }
 
+      if (transactionNumber === 0 && !selectedTransactionType === "קבלה") {
+        return alert("מספר עסקה חייב להיות שונה מ-0");
+      }
+
       // Create the new transaction
 
       const transactionResponse = await axios.post("./transaction/create", formData, {
@@ -450,19 +454,21 @@ const AddTransaction = () => {
             </MenuItem>
             {transactionTypes.map((type) => (
               <MenuItem key={type._id} value={type.typeName}>
-                <ListItemIcon>
+                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                  <ListItemText primary={type.typeName} />
                   {selectedTransactionType !== type.typeName && (
                     <IconButton
                       onClick={(e) => {
                         e.stopPropagation();
                         handleRemoveType(type._id);
                       }}
-                      size="small">
+                      size="small"
+                      sx={{ mr: "auto" }} // push icon to far left in RTL
+                    >
                       <CloseIcon fontSize="small" />
                     </IconButton>
                   )}
-                </ListItemIcon>
-                <ListItemText primary={type.typeName} />
+                </Box>
               </MenuItem>
             ))}
             <MenuItem value="add-new"> הוסף סוג עסקה חדש</MenuItem>
@@ -539,19 +545,21 @@ const AddTransaction = () => {
             </MenuItem>
             {receiversTransaction.map((receiver) => (
               <MenuItem key={receiver._id} value={receiver.receiverName}>
-                <ListItemIcon>
+                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                  <ListItemText primary={receiver.receiverName} />
                   {selectedReceiver !== receiver.receiverName && (
                     <IconButton
                       onClick={(e) => {
                         e.stopPropagation();
                         handleRemoveReceiver(receiver._id);
                       }}
-                      size="small">
+                      size="small"
+                      sx={{ mr: "auto" }} // push to far left in RTL
+                    >
                       <CloseIcon fontSize="small" />
                     </IconButton>
                   )}
-                </ListItemIcon>
-                <ListItemText primary={receiver.receiverName} />
+                </Box>
               </MenuItem>
             ))}
             <MenuItem value="add-new"> הוסף מקבל חדש</MenuItem>
@@ -597,19 +605,21 @@ const AddTransaction = () => {
             </MenuItem>
             {transactionCategories.map((category) => (
               <MenuItem key={category._id} value={category.categoryName}>
-                <ListItemIcon>
+                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                  <ListItemText primary={category.categoryName} />
                   {selectedTransactionCategory !== category.categoryName && (
                     <IconButton
                       onClick={(e) => {
                         e.stopPropagation();
                         handleRemoveCategory(category._id);
                       }}
-                      size="small">
+                      size="small"
+                      sx={{ mr: "auto" }} // push to far left
+                    >
                       <CloseIcon fontSize="small" />
                     </IconButton>
                   )}
-                </ListItemIcon>
-                <ListItemText primary={category.categoryName} />
+                </Box>
               </MenuItem>
             ))}
             <MenuItem value="add-new"> הוסף קטגוריה חדשה</MenuItem>
@@ -658,12 +668,16 @@ const AddTransaction = () => {
             {files.length > 0 ? (
               files.map((file, index) => (
                 <ListItem key={index}>
-                  <box key={index} display="flex" alignItems="center">
-                    <Typography variant="body3">{file.name}</Typography>
-                    <IconButton onClick={() => handleDeleteFile(index)}>
-                      <CloseIcon />
+                  <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                    <Typography variant="body2">{file.name}</Typography>
+                    <IconButton
+                      onClick={() => handleDeleteFile(index)}
+                      size="small"
+                      sx={{ mr: "auto" }} // push to far left in RTL
+                    >
+                      <CloseIcon fontSize="small" />
                     </IconButton>
-                  </box>
+                  </Box>
                 </ListItem>
               ))
             ) : (
@@ -673,6 +687,7 @@ const AddTransaction = () => {
             )}
           </List>
         </Box>
+
         <Button type="submit" variant="contained" fullWidth>
           שמור
         </Button>
