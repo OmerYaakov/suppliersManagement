@@ -18,7 +18,7 @@ const TransactionPage = () => {
   const location = useLocation();
   const transaction = location.state?.transaction;
   const [openImage, setOpenImage] = useState(null);
-  const [editedNumber, setEditedNumber] = useState(transaction?.transactionNumber || 0);
+  const [editedNumber, setEditedNumber] = useState("");
   const [isEditingNumber, setIsEditingNumber] = useState(false);
   const baseURL = "http://localhost:5000/public/uploads/";
 
@@ -53,7 +53,6 @@ const TransactionPage = () => {
       return;
     }
 
-    // Don't update if the number didn't change
     if (Number(trimmed) === Number(transaction.transactionNumber)) {
       setIsEditingNumber(false);
       return;
@@ -71,6 +70,9 @@ const TransactionPage = () => {
       );
 
       alert("מספר עסקה עודכן בהצלחה");
+
+      // Update local value (in-place to reflect on screen)
+      transaction.transactionNumber = Number(trimmed);
       setIsEditingNumber(false);
     } catch (error) {
       if (error.response?.status === 409) {
@@ -101,27 +103,35 @@ const TransactionPage = () => {
           <Typography variant="subtitle1" color="textSecondary">
             מספר עסקה:
           </Typography>
-          {Number(transactionNumber) === 0 ? (
+          {Number(transaction.transactionNumber) === 0 ? (
             isEditingNumber ? (
-              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <TextField
                   size="small"
                   type="number"
                   value={editedNumber}
                   onChange={(e) => setEditedNumber(e.target.value)}
-                  onBlur={handleTransactionNumberUpdate}
+                  placeholder="הכנס מספר חדש"
                 />
+                <IconButton size="small" onClick={handleTransactionNumberUpdate}>
+                  ✅
+                </IconButton>
               </Box>
             ) : (
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Typography variant="h6">{transactionNumber}</Typography>
-                <IconButton size="small" onClick={() => setIsEditingNumber(true)}>
-                  <EditIcon fontSize="small" />
+                <Typography variant="h6">{transaction.transactionNumber}</Typography>
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setEditedNumber(""); // clear input
+                    setIsEditingNumber(true);
+                  }}>
+                  ✏️
                 </IconButton>
               </Box>
             )
           ) : (
-            <Typography variant="h6">{transactionNumber}</Typography>
+            <Typography variant="h6">{transaction.transactionNumber}</Typography>
           )}
         </Box>
 
