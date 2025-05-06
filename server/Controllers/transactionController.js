@@ -113,6 +113,13 @@ const createTransaction = async (req, res) => {
       return res.status(400).json({ message: "You can attach up to 10 images only." });
     }
 
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    for (let file of req.files) {
+      if (!allowedTypes.includes(file.mimetype)) {
+        return res.status(400).json({ message: `Unsupported file type: ${file.mimetype}` });
+      }
+    }
+
     // ✅ Validate image extensions
     const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
     for (let file of req.files) {
