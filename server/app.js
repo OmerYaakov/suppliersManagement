@@ -12,7 +12,6 @@ import { fileURLToPath } from "url";
 import userRoute from "./Routes/userRoute.js";
 import AWS from "aws-sdk";
 import path from "path";
-import { fileURLToPath } from "url";
 
 dotenv.config();
 const app = express();
