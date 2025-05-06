@@ -1,12 +1,25 @@
 import React, { useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { Box, Typography, Paper, Divider, Grid, Dialog } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Paper,
+  Divider,
+  Grid,
+  Dialog,
+  TextField,
+  IconButton,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import axios from "axios";
 
 const TransactionPage = () => {
   const { transactionNumber } = useParams();
   const location = useLocation();
   const transaction = location.state?.transaction;
   const [openImage, setOpenImage] = useState(null);
+  const [editedNumber, setEditedNumber] = useState(transaction?.transactionNumber || 0);
+  const [isEditingNumber, setIsEditingNumber] = useState(false);
   const baseURL = "http://localhost:5000/public/uploads/";
 
   if (!transaction) {
@@ -25,12 +38,48 @@ const TransactionPage = () => {
   };
 
   const handleImageOpen = (imageUrl) => {
-    console.log(imageUrl);
     setOpenImage(imageUrl);
   };
 
   const handleImageClose = () => {
     setOpenImage(null);
+  };
+
+  const handleTransactionNumberUpdate = async () => {
+    const trimmed = String(editedNumber).trim();
+
+    if (!trimmed || isNaN(trimmed)) {
+      alert("יש להזין מספר חוקי");
+      return;
+    }
+
+    // Don't update if the number didn't change
+    if (Number(trimmed) === Number(transaction.transactionNumber)) {
+      setIsEditingNumber(false);
+      return;
+    }
+
+    try {
+      const res = await axios.patch(
+        `/transaction/updateTransactionNumber/${transaction._id}`,
+        { newTransactionNumber: Number(trimmed) },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      alert("מספר עסקה עודכן בהצלחה");
+      setIsEditingNumber(false);
+    } catch (error) {
+      if (error.response?.status === 409) {
+        alert("מספר עסקה כבר קיים");
+      } else {
+        console.error("Failed to update transaction number:", error);
+        alert("שגיאה בעדכון מספר העסקה");
+      }
+    }
   };
 
   return (
@@ -40,30 +89,56 @@ const TransactionPage = () => {
           פרטי העסקה
         </Typography>
         <Divider sx={{ marginBottom: 2 }} />
+
         <Box sx={{ marginBottom: 2 }}>
           <Typography variant="subtitle1" color="textSecondary">
             ספק:
           </Typography>
           <Typography variant="h6">{transaction.supplierName}</Typography>
         </Box>
+
         <Box sx={{ marginBottom: 2 }}>
           <Typography variant="subtitle1" color="textSecondary">
             מספר עסקה:
           </Typography>
-          <Typography variant="h6">{transactionNumber}</Typography>
+          {Number(transactionNumber) === 0 ? (
+            isEditingNumber ? (
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                <TextField
+                  size="small"
+                  type="number"
+                  value={editedNumber}
+                  onChange={(e) => setEditedNumber(e.target.value)}
+                  onBlur={handleTransactionNumberUpdate}
+                />
+              </Box>
+            ) : (
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography variant="h6">{transactionNumber}</Typography>
+                <IconButton size="small" onClick={() => setIsEditingNumber(true)}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            )
+          ) : (
+            <Typography variant="h6">{transactionNumber}</Typography>
+          )}
         </Box>
+
         <Box sx={{ marginBottom: 2 }}>
           <Typography variant="subtitle1" color="textSecondary">
             תאריך:
           </Typography>
           <Typography variant="h6">{transaction.transactionDate}</Typography>
         </Box>
+
         <Box sx={{ marginBottom: 2 }}>
           <Typography variant="subtitle1" color="textSecondary">
             סוג:
           </Typography>
           <Typography variant="h6">{transaction.transactionType}</Typography>
         </Box>
+
         <Box sx={{ marginBottom: 2 }}>
           <Typography variant="subtitle1" color="textSecondary">
             סכום העסקה בשקלים:
@@ -74,18 +149,21 @@ const TransactionPage = () => {
             {transaction.transactionAmount} ₪
           </Typography>
         </Box>
+
         <Box sx={{ marginBottom: 2 }}>
           <Typography variant="subtitle1" color="textSecondary">
             מקבל העסקה:
           </Typography>
           <Typography variant="h6">{transaction.receivesTransaction}</Typography>
         </Box>
+
         <Box sx={{ marginBottom: 2 }}>
           <Typography variant="subtitle1" color="textSecondary">
             קטגוריה:
           </Typography>
           <Typography variant="h6">{transaction.transactionCategory}</Typography>
         </Box>
+
         {transaction.notes && (
           <Box>
             <Typography variant="subtitle1" color="textSecondary">
@@ -94,6 +172,7 @@ const TransactionPage = () => {
             <Typography variant="body1">{transaction.notes}</Typography>
           </Box>
         )}
+
         {transaction.files.length > 0 && (
           <Box sx={{ marginTop: 2 }}>
             <Typography variant="subtitle1" color="textSecondary">
@@ -102,39 +181,33 @@ const TransactionPage = () => {
             <Grid container spacing={10}>
               {transaction.files
                 .filter((file) => isImageFile(file?.name))
-                .map((file, index) => {
-                  return (
-                    <Grid item xs={4} key={index}>
-                      <img
-                        crossOrigin="anonymous"
-                        src={file.url}
-                        alt={file.name}
-                        onClick={() => handleImageOpen(file.url)}
-                        style={{
-                          width: "100%",
-                          height: "150px",
-                          objectFit: "cover",
-                          cursor: "pointer",
-                        }}
-                      />
-                    </Grid>
-                  );
-                })}
+                .map((file, index) => (
+                  <Grid item xs={4} key={index}>
+                    <img
+                      crossOrigin="anonymous"
+                      src={file.url}
+                      alt={file.name}
+                      onClick={() => handleImageOpen(file.url)}
+                      style={{
+                        width: "100%",
+                        height: "150px",
+                        objectFit: "cover",
+                        cursor: "pointer",
+                      }}
+                    />
+                  </Grid>
+                ))}
             </Grid>
           </Box>
         )}
-        {/* Fullscreen image dialog */}
+
         <Dialog open={!!openImage} onClose={handleImageClose} maxWidth="md" fullWidth>
           {openImage && (
             <img
               crossOrigin="anonymous"
               src={openImage}
               alt="Full size"
-              style={{
-                width: "100%",
-                height: "auto",
-                objectFit: "contain",
-              }}
+              style={{ width: "100%", height: "auto", objectFit: "contain" }}
             />
           )}
         </Dialog>
