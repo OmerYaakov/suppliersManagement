@@ -27,7 +27,7 @@ const createTransaction = async (req, res) => {
     const existingTransaction = false;
     const userId = req.user.userId;
     // Check if the user is authenticated
-    if (!transactionNumber === 0 && !transactionType === "קבלה") {
+    if (!(transactionNumber === 0 && transactionType === "קבלה")) {
       existingTransaction = await transactionModel.findOne({
         createdBy: userId,
         transactionNumber,

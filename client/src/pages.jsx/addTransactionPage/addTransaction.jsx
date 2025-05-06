@@ -164,8 +164,8 @@ const AddTransaction = () => {
         }
       }
 
-      if (transactionNumber === 0 && !selectedTransactionType === "קבלה") {
-        return alert("מספר עסקה חייב להיות שונה מ-0");
+      if (Number(transactionNumber) === 0 && selectedTransactionType !== "קבלה") {
+        return alert("רק עסקה מסוג קבלה יכולה להכיל מספר עסקה 0");
       }
 
       // Create the new transaction
