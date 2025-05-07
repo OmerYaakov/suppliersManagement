@@ -71,27 +71,6 @@ const getAllSuppliers = async (req, res) => {
 
 const getById = async (req, res) => {};
 
-const updateSupplier = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { sumAmount } = req.body; // Only update the sumAmount field
-
-    const updatedSupplier = await supplierModel.findByIdAndUpdate(
-      id,
-      { $set: { sumAmount } }, // Update only the sumAmount field
-      { new: true }
-    );
-
-    if (!updatedSupplier) {
-      return res.status(404).json({ message: "Supplier not found" });
-    }
-
-    res.status(200).json(updatedSupplier);
-  } catch (error) {
-    console.error("Error updating supplier:", error.message);
-    res.status(500).json({ message: error.message });
-  }
-};
 
 const getSumAmount = async (req, res) => {
   try {
@@ -146,4 +125,36 @@ const updateSupplierAmount = async (req, res) => {
   }
 };
 
-export default { createSupplier, getAllSuppliers, getById, updateSupplierAmount, getSumAmount };
+
+
+const updateSupplier = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    if (updates.supplierName) {
+      return res.status(400).json({ message: "Cannot update supplier name." });
+    }
+
+    const updatedSupplier = await supplierModel.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!updatedSupplier) {
+      return res.status(404).json({ message: "Supplier not found." });
+    }
+
+    res.status(200).json(updatedSupplier);
+  } catch (error) {
+    console.error("Error updating supplier:", error.message);
+    res.status(500).json({ message: "Failed to update supplier." });
+  }
+};
+
+export default {
+  createSupplier,
+  getAllSuppliers,
+  getById,
+  updateSupplierAmount,
+  getSumAmount,
+  updateSupplier,
+};
+

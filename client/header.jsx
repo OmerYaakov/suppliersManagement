@@ -8,10 +8,10 @@ import Logout from "./src/components/logout";
 
 const header = () => {
   const navigate = useNavigate();
-  const locaition = useLocation();
+  const location = useLocation();
   const isLoggedIn = localStorage.getItem("profile") ? true : false;
 
-  if (locaition.pathname === "/login") {
+  if (location.pathname === "/login") {
     return null; // Don't render the header on the login page
   }
 
@@ -34,6 +34,13 @@ const header = () => {
               </a>
             </li>
             <li>
+
+              <a href="/manageSuppliers" className="nav-link px-2 text-white">
+                ניהול ספקים
+              </a>
+            </li>
+            <li>
+
               <a href="/SupplierLedger" className="nav-link px-2 text-white">
                 כרטסת ספקים
               </a>

@@ -1,2 +1,10 @@
 node_modules
+<<<<<<< HEAD
 server/.envserver/.env
+=======
+.env
+*.env
+.env.*
+client/.env*
+server/.env*
+>>>>>>> clean-supplierPage
