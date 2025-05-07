@@ -58,7 +58,7 @@ const SupplierLedger = () => {
     }
 
     try {
-      const response = await axios.get("/supplier/get", {
+      const response = await api.get("/supplier/get", {
         headers: {
           Authorization: `Bearer ${token}`, // Include the token in the Authorization header
         },
@@ -79,7 +79,7 @@ const SupplierLedger = () => {
       console.log("get transaction by supplier....");
 
       // Fetch transactions by supplier
-      const res = await axios.get(`/transaction/getBySupplier/`, {
+      const res = await api.get(`/transaction/getBySupplier/`, {
         params: { supplierName },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token in the Authorization header
