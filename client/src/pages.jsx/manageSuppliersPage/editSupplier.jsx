@@ -34,7 +34,7 @@ const EditSupplier = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert("עודכן בהצלחה");
-      navigate("/manage-suppliers");
+      navigate("/manageSuppliers");
     } catch (err) {
       console.error("Update failed:", err);
       alert("שגיאה בעדכון הספק");
