@@ -6,14 +6,15 @@ import SupplierLedger from "./pages.jsx/supplierLedgerPage/supplierLedger";
 import TransactionPage from "./pages.jsx/transactionPage/transactionPage";
 import Login from "./pages.jsx/loginPage/login";
 import ManageSuppliers from "./pages.jsx/manageSuppliersPage/manageSuppliers";
+import EditSupplier from "./pages.jsx/manageSuppliersPage/editSupplier";
+import Header from "../header";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 axios.defaults.baseURL =
   import.meta.env.MODE === "development" ? import.meta.env.VITE_API_URL : "/api";
 
-import Header from "../header";
-import "bootstrap/dist/css/bootstrap.min.css";
 function App() {
   return (
     <>
@@ -25,6 +26,7 @@ function App() {
           <Route path="/supplierLedger" element={<SupplierLedger />} />
           <Route path="/" element={<SupplierLedger />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/supplier/update/:id" element={<EditSupplier />} />
 
           <Route path="/manageSuppliers" element={<ManageSuppliers />} />
           {/* <Route path="/manageSuppliers/:supplierName" element={<ManageSuppliers />} /> */}
