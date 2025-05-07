@@ -11,6 +11,7 @@ import {
   Paper,
 } from "@mui/material";
 import api from "../../api";
+import axios from "axios";
 
 const ManageSuppliers = () => {
   const [suppliers, setSuppliers] = useState([]);
