@@ -11,7 +11,11 @@ services:
   server:
     build: ./server
     env_file:
+<<<<<<< HEAD
       - ./server/.env
+=======
+      - ./server/.env.production
+>>>>>>> clean-supplierPage
     ports:
       - "5000:5000"
     environment:

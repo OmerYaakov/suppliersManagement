@@ -1,5 +1,9 @@
 import { defineConfig } from "vite";
+<<<<<<< HEAD
 import dotenv from "dotenv";
+=======
+import dotenv from "dotenv-flow";
+>>>>>>> clean-supplierPage
 import react from "@vitejs/plugin-react";
 
 // Load environment variables from .env file
@@ -15,6 +19,12 @@ export default defineConfig({
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     },
+<<<<<<< HEAD
+=======
+    proxy: {
+      "/api": "http://localhost:5000",
+    },
+>>>>>>> clean-supplierPage
   },
   preview: {
     port: 5173, // Ensure Vite preview uses port 5173 explicitly
@@ -39,4 +49,10 @@ export default defineConfig({
       },
     },
   },
+<<<<<<< HEAD
+=======
+  define: {
+    "process.env": process.env,
+  },
+>>>>>>> clean-supplierPage
 });

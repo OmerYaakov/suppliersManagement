@@ -14,4 +14,6 @@ router.post("/updateAmount", checkAuth, SupplierController.updateSupplierAmount)
 
 router.get("/getSupplierAmount", checkAuth, SupplierController.getSumAmount);
 
+router.put("/update/:id", checkAuth, SupplierController.updateSupplier);
+
 export default router;
