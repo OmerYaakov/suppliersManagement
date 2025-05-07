@@ -19,10 +19,8 @@
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-<<<<<<< HEAD
-=======
     "dotenv-flow": "^4.1.0",
->>>>>>> clean-supplierPage
+
     "express": "^4.21.2",
     "heic-convert": "^2.1.0",
     "jsonwebtoken": "^9.0.2",
