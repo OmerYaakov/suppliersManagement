@@ -1,4 +1,5 @@
 import supplierModel from "../Models/supplierModel.js";
+import mongoose from "mongoose"; // Import mongoose to validate ObjectId
 
 const createSupplier = async (req, res) => {
   console.log("Creating supplier...");
@@ -69,8 +70,26 @@ const getAllSuppliers = async (req, res) => {
   }
 };
 
-const getById = async (req, res) => {};
+const getById = async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    // בדיקה האם ה-ID תקין
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid supplier ID" });
+    }
+
+    const supplier = await supplierModel.findById(id);
+    if (!supplier) {
+      return res.status(404).json({ message: "Supplier not found" });
+    }
+
+    res.status(200).json(supplier);
+  } catch (error) {
+    console.error("Error in getById:", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 
 const getSumAmount = async (req, res) => {
   try {
@@ -125,8 +144,6 @@ const updateSupplierAmount = async (req, res) => {
   }
 };
 
-
-
 const updateSupplier = async (req, res) => {
   try {
     const { id } = req.params;
@@ -157,4 +174,3 @@ export default {
   getSumAmount,
   updateSupplier,
 };
-
