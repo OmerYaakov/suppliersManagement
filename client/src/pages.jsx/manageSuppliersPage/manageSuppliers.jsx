@@ -22,7 +22,7 @@ const ManageSuppliers = () => {
 
   const fetchSuppliers = async () => {
     try {
-      const res = await axios.get("/supplier/get", {
+      const res = await api.get("/supplier/get", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (Array.isArray(res.data)) {
