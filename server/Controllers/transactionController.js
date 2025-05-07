@@ -157,11 +157,6 @@ const updateTransactionNumber = async (req, res) => {
   const { newTransactionNumber } = req.body;
 
   try {
-<<<<<<< HEAD
-=======
-    console.log("Looking for transactionNumber:", newTransactionNumber);
-
->>>>>>> clean-supplierPage
     // Check if another transaction already has this number
     const existing = await transactionModel.findOne({
       transactionNumber: newTransactionNumber,
