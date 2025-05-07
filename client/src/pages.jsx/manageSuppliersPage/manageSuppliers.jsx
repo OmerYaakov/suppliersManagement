@@ -22,7 +22,7 @@ const ManageSuppliers = () => {
 
   const fetchSuppliers = async () => {
     try {
-      const res = await api.get("/supplier/get", {
+      const res = await axios.get("/supplier/get", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (Array.isArray(res.data)) {
@@ -45,7 +45,7 @@ const ManageSuppliers = () => {
   const handleSave = async (supplier) => {
     const { _id, supplierName, ...editableFields } = supplier;
     try {
-      await axios.api(`/supplier/update/${_id}`, editableFields, {
+      await axios.put(`/supplier/update/${_id}`, editableFields, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert("עודכן בהצלחה");
