@@ -12,7 +12,6 @@ import axios from "axios";
 axios.defaults.baseURL =
   import.meta.env.MODE === "development" ? import.meta.env.VITE_API_URL : "/api";
 
-
 import Header from "../header";
 import "bootstrap/dist/css/bootstrap.min.css";
 function App() {
@@ -28,7 +27,7 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           <Route path="/manageSuppliers" element={<ManageSuppliers />} />
-          <Route path="/manageSuppliers/:supplierName" element={<ManageSuppliers />} />
+          {/* <Route path="/manageSuppliers/:supplierName" element={<ManageSuppliers />} /> */}
           <Route path="/transaction/:transactionNumber" element={<TransactionPage />} />
         </Routes>
       </BrowserRouter>

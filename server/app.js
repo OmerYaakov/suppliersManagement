@@ -16,11 +16,7 @@ import path from "path";
 dotenv.config();
 const app = express();
 if (process.env.NODE_ENV === "production") {
-<<<<<<< HEAD
   console.log = function () {}; // Disable all console.log in production
-=======
-  console.log = () => {};
->>>>>>> clean-supplierPage
 }
 
 app.listen(5000, "0.0.0.0", () => {
@@ -48,15 +44,11 @@ mongoose
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-<<<<<<< HEAD
-const allowedOrigins = ["https://supplier-mang.com", "https://www.supplier-mang.com"];
-=======
 const allowedOrigins = [
   "http://localhost:5173", // frontend dev
   "https://supplier-mang.com", // production
   "https://www.supplier-mang.com",
 ];
->>>>>>> clean-supplierPage
 
 app.use(
   cors({
@@ -67,11 +59,9 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
-<<<<<<< HEAD
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-=======
+
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
->>>>>>> clean-supplierPage
+
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })

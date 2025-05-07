@@ -10,7 +10,7 @@ import {
   Button,
   Paper,
 } from "@mui/material";
-import axios from "axios";
+import api from "../../api";
 
 const ManageSuppliers = () => {
   const [suppliers, setSuppliers] = useState([]);
@@ -22,10 +22,17 @@ const ManageSuppliers = () => {
 
   const fetchSuppliers = async () => {
     try {
-      const res = await axios.get("/supplier/get", {
+      const res = await api.get("/supplier/get", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setSuppliers(res.data);
+      if (Array.isArray(res.data)) {
+        setSuppliers(res.data);
+      } else if (Array.isArray(res.data.suppliers)) {
+        setSuppliers(res.data.suppliers);
+      } else {
+        console.error("Unexpected response:", res.data);
+        setSuppliers([]);
+      }
     } catch (err) {
       console.error("Failed to fetch suppliers:", err);
     }
@@ -38,7 +45,7 @@ const ManageSuppliers = () => {
   const handleSave = async (supplier) => {
     const { _id, supplierName, ...editableFields } = supplier;
     try {
-      await axios.put(`/supplier/update/${_id}`, editableFields, {
+      await axios.api(`/supplier/update/${_id}`, editableFields, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert("עודכן בהצלחה");
