@@ -20,46 +20,21 @@ const ManageSuppliers = () => {
     fetchSuppliers();
   }, []);
 
-  // const fetchSuppliers = async () => {
-  //   try {
-  //     const res = await api.get("/supplier/get", {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-  //     if (Array.isArray(res.data)) {
-  //       setSuppliers(res.data);
-  //     } else if (Array.isArray(res.data.suppliers)) {
-  //       setSuppliers(res.data.suppliers);
-  //     } else {
-  //       console.error("Unexpected response:", res.data);
-  //       setSuppliers([]);
-  //     }
-  //   } catch (err) {
-  //     console.error("Failed to fetch suppliers:", err);
-  //   }
-  // };
-
   const fetchSuppliers = async () => {
-    if (!token) {
-      console.log("No token found, redirecting to login...");
-      // Optionally redirect to the login page if the token is not found
-      window.location.href = "/login"; // or use navigate() for React Router
-      return;
-    }
-
     try {
-      const response = await axios.get("/supplier/get", {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-        },
+      const res = await api.get("/supplier/get", {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("Suppliers fetched:", response.data);
-      setSuppliers(response.data);
-    } catch (error) {
-      console.error("Error fetching suppliers:", error.response);
-      if (error.response && error.response.status === 401) {
-        // Token expired or invalid, redirect to login page
-        window.location.href = "/login"; // or use navigate() for React Router
+      if (Array.isArray(res.data)) {
+        setSuppliers(res.data);
+      } else if (Array.isArray(res.data.suppliers)) {
+        setSuppliers(res.data.suppliers);
+      } else {
+        console.error("Unexpected response:", res.data);
+        setSuppliers([]);
       }
+    } catch (err) {
+      console.error("Failed to fetch suppliers:", err);
     }
   };
 
