@@ -1,6 +1,6 @@
 import "./supplierLedger.css";
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Box,
   Table,
@@ -27,10 +27,17 @@ const SupplierLedger = () => {
   const [transactionBySupplier, setTransactionBySupplier] = useState([]);
   const [sumAmountSelectedSupplier, setSumAmountSelectedSupplier] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const token = localStorage.getItem("token"); // Get the token from localStorage
 
   useEffect(() => {
     fetchSuppliers();
+    if (location.state?.supplierName) {
+      const name = location.state.supplierName;
+      setSelectedSupplier(name);
+      getTransactionBySupplier(name);
+      window.history.replaceState({}, document.title); // clear state
+    }
   }, []);
 
   const resetForm = () => {
@@ -150,7 +157,11 @@ const SupplierLedger = () => {
                     ? "supplierSumAmountNeg"
                     : "supplierSumAmountPos"
                 }`}>
-                {(Number(sumAmountSelectedSupplier) || 0).toFixed(2)}₪
+                {(Number(sumAmountSelectedSupplier) || 0).toLocaleString("he-IL", {
+                  style: "currency",
+                  currency: "ILS",
+                  minimumFractionDigits: 2,
+                })}
               </span>
             </span>
           </h1>
@@ -181,7 +192,11 @@ const SupplierLedger = () => {
                 <TableCell>
                   {(transaction.transactionType === "קבלה" ||
                     transaction.transactionType === "חשבונית-קבלה") &&
-                    `${transaction.transactionAmount} ₪`}
+                    (transaction.transactionAmount || 0).toLocaleString("he-IL", {
+                      style: "currency",
+                      currency: "ILS",
+                      minimumFractionDigits: 2,
+                    })}
                 </TableCell>
                 <TableCell
                   style={{
@@ -190,7 +205,11 @@ const SupplierLedger = () => {
                   {(transaction.transactionType === "חשבונית" ||
                     transaction.transactionType === "חשבונית-קבלה" ||
                     transaction.transactionType === "זיכוי") &&
-                    `${transaction.transactionAmount} ₪`}
+                    (transaction.transactionAmount || 0).toLocaleString("he-IL", {
+                      style: "currency",
+                      currency: "ILS",
+                      minimumFractionDigits: 2,
+                    })}
                 </TableCell>
                 <TableCell></TableCell>
               </TableRow>
