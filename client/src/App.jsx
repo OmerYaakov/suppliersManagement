@@ -9,6 +9,7 @@ import ManageSuppliers from "./pages.jsx/manageSuppliersPage/manageSuppliers";
 import EditSupplier from "./pages.jsx/manageSuppliersPage/editSupplier";
 import Header from "../header";
 import "bootstrap/dist/css/bootstrap.min.css";
+import SupplierBalances from "./pages.jsx/manageSuppliersPage/supplierBalances";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
@@ -29,7 +30,7 @@ function App() {
           <Route path="/supplier/update/:id" element={<EditSupplier />} />
 
           <Route path="/manageSuppliers" element={<ManageSuppliers />} />
-          {/* <Route path="/manageSuppliers/:supplierName" element={<ManageSuppliers />} /> */}
+          <Route path="/supplierBalances" element={<SupplierBalances />} />
           <Route path="/transaction/:transactionNumber" element={<TransactionPage />} />
         </Routes>
       </BrowserRouter>
