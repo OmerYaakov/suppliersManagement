@@ -66,8 +66,14 @@ const EditSupplier = () => {
           fontWeight: "bold",
           fontSize: "1.2rem",
         }}>
-        יתרה: {Number(supplier.sumAmount).toFixed(2)} ₪
+        יתרה:{" "}
+        {(Number(supplier.sumAmount) || 0).toLocaleString("he-IL", {
+          style: "currency",
+          currency: "ILS",
+          minimumFractionDigits: 2,
+        })}
       </Typography>
+
       <TextField
         label="כתובת"
         value={supplier.addres || ""}
