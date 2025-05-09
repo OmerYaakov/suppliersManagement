@@ -200,7 +200,7 @@ const SupplierLedger = () => {
                 </TableCell>
                 <TableCell
                   style={{
-                    color: transaction.transactionType === "זיכוי" ? "red" : "inherit",
+                    color: transaction.transactionType === "זיכוי" ? "red" : "green",
                   }}>
                   {(transaction.transactionType === "חשבונית" ||
                     transaction.transactionType === "חשבונית-קבלה" ||
