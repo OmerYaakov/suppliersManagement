@@ -34,13 +34,16 @@ const header = () => {
               </a>
             </li>
             <li>
-
               <a href="/manageSuppliers" className="nav-link px-2 text-white">
                 ניהול ספקים
               </a>
             </li>
             <li>
-
+              <a href="/supplierBalances" className="nav-link px-2 text-white">
+                יתרות ספקים
+              </a>
+            </li>
+            <li>
               <a href="/SupplierLedger" className="nav-link px-2 text-white">
                 כרטסת ספקים
               </a>

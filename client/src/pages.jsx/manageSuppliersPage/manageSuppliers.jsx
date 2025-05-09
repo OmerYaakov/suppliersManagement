@@ -33,17 +33,9 @@ const ManageSuppliers = () => {
       console.error("Failed to fetch suppliers:", err);
     }
   };
-  const totalSumAmount = suppliers.reduce((acc, curr) => acc + (curr.sumAmount || 0), 0);
 
   return (
     <>
-      <Typography
-        variant="h5"
-        align="center"
-        sx={{ color: totalSumAmount < 0 ? "red" : "green", fontWeight: "bold", marginTop: 2 }}>
-        סך הכל יתרה של כל הספקים: {totalSumAmount.toFixed(2)} ₪
-      </Typography>
-
       <TableContainer
         component={Paper}
         sx={{ marginTop: 4, borderRadius: 2, maxWidth: "95%", mx: "auto" }}>
