@@ -242,8 +242,13 @@ const exportSuppliersToExcel = async (req, res) => {
         sumAmount: supplier.sumAmount,
       });
       worksheet.eachRow((row, rowNumber) => {
-        row.eachCell((cell) => {
+        row.eachCell((cell, colNumber) => {
           cell.alignment = { vertical: "middle", horizontal: "center" };
+
+          if (colNumber === 6 && rowNumber > 1) {
+            // Format only the balance column (skip header)
+            cell.numFmt = '"₪"#,##0.00';
+          }
         });
       });
     });
