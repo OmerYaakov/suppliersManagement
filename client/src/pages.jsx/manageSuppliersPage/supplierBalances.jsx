@@ -11,7 +11,9 @@ import {
   Button,
   Paper,
   Typography,
+  Tooltip,
 } from "@mui/material";
+import ExcelIcon from "../../assets/ExcelIcon.svg"; // Adjust the path as necessary
 
 const SupplierBalances = () => {
   const navigate = useNavigate();
@@ -42,6 +44,36 @@ const SupplierBalances = () => {
 
   return (
     <>
+      <Tooltip title="ייצוא כל עסקאות הספקים לאקסל" arrow>
+        <Button
+          variant="contained"
+          endIcon={<img src={ExcelIcon} alt="Excel" width="20" />}
+          sx={{ display: "block", mx: "auto", mt: 5, mb: 2 }}
+          hint
+          onClick={async () => {
+            try {
+              const res = await api.get("/transaction/exportAllTransactions", {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+                responseType: "blob",
+              });
+
+              const blob = new Blob([res.data], {
+                type: res.headers["content-type"],
+              });
+
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = "transactions.xlsx";
+              a.click();
+            } catch (error) {
+              console.error("Error downloading Excel file:", error);
+            }
+          }}></Button>
+      </Tooltip>
       <Typography
         variant="h5"
         align="center"
