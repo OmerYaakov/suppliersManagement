@@ -16,6 +16,12 @@ router.get("/getSupplierAmount", checkAuth, SupplierController.getSumAmount);
 
 router.put("/update/:id", checkAuth, SupplierController.updateSupplier);
 
+router.get(
+  "/exportSuppliersBalances",
+  checkAuth,
+  SupplierController.exportSuppliersBalancesToExcel
+);
+
 router.get("/exportSuppliers", checkAuth, SupplierController.exportSuppliersToExcel);
 
 export default router;

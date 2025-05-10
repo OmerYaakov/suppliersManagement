@@ -167,6 +167,49 @@ const updateSupplier = async (req, res) => {
   }
 };
 
+const exportSuppliersBalancesToExcel = async (req, res) => {
+  try {
+    const userId = req.user.userId; // Get userId from the decoded token
+
+    const suppliers = await supplierModel.find({ createdBy: userId });
+    if (!suppliers || suppliers.length === 0) {
+      return res.status(404).json({ message: "No suppliers found for this user." });
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Suppliers");
+    worksheet.columns = [
+      { header: "שם הספק", key: "supplierName", width: 30, centered: true },
+      { header: "יתרה", key: "sumAmount", width: 15, centered: true },
+    ];
+
+    suppliers.forEach((supplier) => {
+      worksheet.addRow({
+        supplierName: supplier.supplierName,
+        sumAmount: supplier.sumAmount,
+      });
+      worksheet.eachRow((row, rowNumber) => {
+        row.eachCell((cell) => {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        });
+      });
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    const encodedFileName = encodeURIComponent(`suppliers_all}.xlsx`);
+    res.setHeader("Content-Disposition", `attachment; filename*=UTF-8''${encodedFileName}`);
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error("Excel export error:", error);
+    res.status(500).json({ message: "שגיאה בייצוא לאקסל" });
+  }
+};
+
 const exportSuppliersToExcel = async (req, res) => {
   try {
     const userId = req.user.userId; // Get userId from the decoded token
@@ -191,12 +234,7 @@ const exportSuppliersToExcel = async (req, res) => {
     suppliers.forEach((supplier) => {
       worksheet.addRow({
         supplierName: supplier.supplierName,
-        addres: supplier.addres,
-        phone: supplier.phone,
-        contactName: supplier.contactName,
-        contactPhone: supplier.contactPhone,
         sumAmount: supplier.sumAmount,
-        notes: supplier.notes,
       });
       worksheet.eachRow((row, rowNumber) => {
         row.eachCell((cell) => {
@@ -227,5 +265,6 @@ export default {
   updateSupplierAmount,
   getSumAmount,
   updateSupplier,
+  exportSuppliersBalancesToExcel,
   exportSuppliersToExcel,
 };
