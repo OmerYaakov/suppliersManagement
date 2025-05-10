@@ -3,6 +3,7 @@ import AWS from "aws-sdk";
 import path from "path";
 import heicConvert from "heic-convert";
 import ExcelJS from "exceljs";
+import supplierModel from "../Models/supplierModel.js";
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -190,38 +191,52 @@ const exportSupplierTransactionsToExcel = async (req, res) => {
     if (supplierName) {
       query.supplierName = supplierName;
     }
+    const supplier = await supplierModel.findOne({ createdBy: userId, supplierName }, "sumAmount");
+    if (!supplier) {
+      return res.status(404).json({ message: "Supplier not found" });
+    }
 
     const transactions = await transactionModel.find(query).sort({ transactionDate: -1 });
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Transactions");
-
     worksheet.columns = [
-      { header: "מספר עסקה", key: "transactionNumber", width: 15 },
       { header: "שם ספק", key: "supplierName", width: 25 },
-      { header: "סוג עסקה", key: "transactionType", width: 15 },
       { header: "תאריך", key: "transactionDate", width: 20 },
-      { header: "סכום", key: "transactionAmount", width: 15 },
-      { header: "מקבל עסקה", key: "receivesTransaction", width: 25 },
-      { header: "קטגוריה", key: "transactionCategory", width: 20 },
-      { header: "הערות", key: "notes", width: 30 },
+      { header: "סוג עסקה", key: "transactionType", width: 15 },
+      { header: "מספר עסקה", key: "transactionNumber", width: 15 },
+      { header: "סכום", key: "transactionAmount", width: 20 },
     ];
 
+    // worksheet.addRow({
+    //   supplierName: "שם ספק",
+    //   transactionDate: "תאריך",
+    //   transactionType: "סוג עסקה",
+    //   transactionNumber: "מספר עסקה",
+    //   transactionAmount: "סכום",
+    // });
+
+    const headerRow = worksheet.lastRow;
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.alignment = { horizontal: "center" };
+    });
     transactions.forEach((t) => {
       worksheet.addRow({
-        transactionNumber: t.transactionNumber,
         supplierName: t.supplierName,
-        transactionType: t.transactionType,
         transactionDate: t.transactionDate,
+        transactionType: t.transactionType,
+        transactionNumber: t.transactionNumber,
         transactionAmount: t.transactionAmount,
-        receivesTransaction: t.receivesTransaction,
-        transactionCategory: t.transactionCategory,
-        notes: t.notes,
       });
-      worksheet.eachRow((row, rowNumber) => {
-        row.eachCell((cell) => {
-          cell.alignment = { vertical: "middle", horizontal: "center" };
-        });
+    });
+
+    worksheet.eachRow((row) => {
+      row.eachCell((cell, colNumber) => {
+        cell.alignment = { vertical: "middle", horizontal: "center" };
+        if (colNumber === 5) {
+          cell.numFmt = '"₪"#,##0.00';
+        }
       });
     });
 
@@ -251,26 +266,20 @@ const exportAllTransactionsToExcel = async (req, res) => {
     const worksheet = workbook.addWorksheet("All Transactions");
 
     worksheet.columns = [
-      { header: "מספר עסקה", key: "transactionNumber", width: 15 },
       { header: "שם ספק", key: "supplierName", width: 25 },
-      { header: "סוג עסקה", key: "transactionType", width: 15 },
       { header: "תאריך", key: "transactionDate", width: 20 },
+      { header: "סוג עסקה", key: "transactionType", width: 15 },
+      { header: "מספר עסקה", key: "transactionNumber", width: 15 },
       { header: "סכום", key: "transactionAmount", width: 15 },
-      { header: "מקבל עסקה", key: "receivesTransaction", width: 25 },
-      { header: "קטגוריה", key: "transactionCategory", width: 20 },
-      { header: "הערות", key: "notes", width: 30 },
     ];
 
     transactions.forEach((t) => {
       worksheet.addRow({
-        transactionNumber: t.transactionNumber,
         supplierName: t.supplierName,
-        transactionType: t.transactionType,
         transactionDate: t.transactionDate,
+        transactionType: t.transactionType,
+        transactionNumber: t.transactionNumber,
         transactionAmount: t.transactionAmount,
-        receivesTransaction: t.receivesTransaction,
-        transactionCategory: t.transactionCategory,
-        notes: t.notes,
       });
       worksheet.eachRow((row, rowNumber) => {
         row.eachCell((cell) => {
