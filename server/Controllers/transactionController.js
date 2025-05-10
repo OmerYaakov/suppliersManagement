@@ -218,6 +218,11 @@ const exportSupplierTransactionsToExcel = async (req, res) => {
         transactionCategory: t.transactionCategory,
         notes: t.notes,
       });
+      worksheet.eachRow((row, rowNumber) => {
+        row.eachCell((cell) => {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        });
+      });
     });
 
     res.setHeader(
@@ -265,6 +270,11 @@ const exportAllTransactionsToExcel = async (req, res) => {
         receivesTransaction: t.receivesTransaction,
         transactionCategory: t.transactionCategory,
         notes: t.notes,
+      });
+      worksheet.eachRow((row, rowNumber) => {
+        row.eachCell((cell) => {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        });
       });
     });
 
