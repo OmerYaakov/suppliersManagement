@@ -214,7 +214,7 @@ const exportSuppliersToExcel = async (req, res) => {
   try {
     const userId = req.user.userId; // Get userId from the decoded token
 
-    const suppliers = await supplierModel.find({ createdBy: userId });
+    const suppliers = await supplierModel.find({ createdBy: userId }).sort({ supplierName: 1 });
     if (!suppliers || suppliers.length === 0) {
       return res.status(404).json({ message: "No suppliers found for this user." });
     }
@@ -234,6 +234,11 @@ const exportSuppliersToExcel = async (req, res) => {
     suppliers.forEach((supplier) => {
       worksheet.addRow({
         supplierName: supplier.supplierName,
+        addres: supplier.addres,
+        phone: supplier.phone,
+        contactName: supplier.contactName,
+        contactPhone: supplier.contactPhone,
+        notes: supplier.notes,
         sumAmount: supplier.sumAmount,
       });
       worksheet.eachRow((row, rowNumber) => {
