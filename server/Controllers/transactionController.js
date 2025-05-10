@@ -191,7 +191,7 @@ const exportTransactionsToExcel = async (req, res) => {
       query.supplierName = supplierName;
     }
 
-    const transactions = await transactionModel.find(query);
+    const transactions = await transactionModel.find(query).sort({ transactionDate: -1 });
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Transactions");
