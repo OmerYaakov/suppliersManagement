@@ -14,6 +14,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Button,
 } from "@mui/material";
 import axios from "axios";
 import api from "../../api";
@@ -167,6 +168,41 @@ const SupplierLedger = () => {
           </h1>
         </FormControl>
       </Box>
+      {selectedSupplier && (
+        <Button
+          variant="contained"
+          sx={{ display: "block", mx: "auto", mt: 2 }}
+          onClick={async () => {
+            try {
+              const token = localStorage.getItem("token");
+              const res = await api.get("/transaction/exportTransactions", {
+                headers: {
+                  Authorization: `Bearer ${token}`, // ✅ fix template string
+                  "Content-Type": "application/json",
+                },
+                params: { supplierName: selectedSupplier },
+                responseType: "blob", // ✅ necessary to handle Excel file
+              });
+
+              const blob = new Blob([res.data], {
+                type: res.headers["content-type"],
+              });
+
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `transactions_${selectedSupplier}.xlsx`; // ✅ fix filename string
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+            } catch (error) {
+              console.error("Export failed:", error);
+              alert("שגיאה בייצוא הקובץ");
+            }
+          }}>
+          ייצוא לאקסל
+        </Button>
+      )}
       <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
         <Table>
           <TableHead>

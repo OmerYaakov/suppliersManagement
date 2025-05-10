@@ -36,6 +36,40 @@ const ManageSuppliers = () => {
 
   return (
     <>
+      <Button
+        variant="contained"
+        sx={{ display: "block", mx: "auto", mt: 2 }}
+        onClick={async () => {
+          try {
+            const token = localStorage.getItem("token");
+            const res = await api.get("/supplier/exportSuppliers", {
+              headers: {
+                Authorization: `Bearer ${token}`, // ✅ fix template string
+                "Content-Type": "application/json",
+              },
+
+              responseType: "blob", // ✅ necessary to handle Excel file
+            });
+
+            const blob = new Blob([res.data], {
+              type: res.headers["content-type"],
+            });
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `suppliers.xlsx`; // ✅ fix filename string
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+          } catch (error) {
+            console.error("Export failed:", error);
+            alert("שגיאה בייצוא הקובץ");
+          }
+        }}>
+        ייצוא לאקסל
+      </Button>
+
       <TableContainer
         component={Paper}
         sx={{ marginTop: 4, borderRadius: 2, maxWidth: "95%", mx: "auto" }}>

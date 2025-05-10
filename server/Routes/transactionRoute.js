@@ -43,4 +43,6 @@ router.post(
   transactionController.createTransaction
 );
 
+router.get("/exportTransactions", checkAuth, transactionController.exportTransactionsToExcel);
+
 export default router;
