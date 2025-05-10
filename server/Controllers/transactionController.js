@@ -181,7 +181,7 @@ const updateTransactionNumber = async (req, res) => {
   }
 };
 
-const exportTransactionsToExcel = async (req, res) => {
+const exportSupplierTransactionsToExcel = async (req, res) => {
   try {
     const userId = req.user.userId;
     const { supplierName } = req.query;
@@ -235,6 +235,54 @@ const exportTransactionsToExcel = async (req, res) => {
   }
 };
 
+const exportAllTransactionsToExcel = async (req, res) => {
+  try {
+    const transactions = await transactionModel
+      .find()
+      .sort({ supplierName: -1, transactionDate: -1 });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("All Transactions");
+
+    worksheet.columns = [
+      { header: "מספר עסקה", key: "transactionNumber", width: 15 },
+      { header: "שם ספק", key: "supplierName", width: 25 },
+      { header: "סוג עסקה", key: "transactionType", width: 15 },
+      { header: "תאריך", key: "transactionDate", width: 20 },
+      { header: "סכום", key: "transactionAmount", width: 15 },
+      { header: "מקבל עסקה", key: "receivesTransaction", width: 25 },
+      { header: "קטגוריה", key: "transactionCategory", width: 20 },
+      { header: "הערות", key: "notes", width: 30 },
+    ];
+
+    transactions.forEach((t) => {
+      worksheet.addRow({
+        transactionNumber: t.transactionNumber,
+        supplierName: t.supplierName,
+        transactionType: t.transactionType,
+        transactionDate: t.transactionDate,
+        transactionAmount: t.transactionAmount,
+        receivesTransaction: t.receivesTransaction,
+        transactionCategory: t.transactionCategory,
+        notes: t.notes,
+      });
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    const encodedFileName = encodeURIComponent(`all_transactions.xlsx`);
+    res.setHeader("Content-Disposition", `attachment; filename*=UTF-8''${encodedFileName}`);
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error("Excel export error:", error);
+    res.status(500).json({ message: "שגיאה בייצוא לאקסל" });
+  }
+};
+
 const getById = async (req, res) => {};
 
 const getByDate = async (req, res) => {};
@@ -246,5 +294,6 @@ export default {
   getById,
   getByDate,
   updateTransactionNumber,
-  exportTransactionsToExcel,
+  exportSupplierTransactionsToExcel,
+  exportAllTransactionsToExcel,
 };

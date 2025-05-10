@@ -14,10 +14,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Tooltip,
   Button,
 } from "@mui/material";
 import axios from "axios";
 import api from "../../api";
+import ExcelIcon from "../../assets/ExcelIcon.svg"; // Adjust the path as necessary
 
 const SupplierLedger = () => {
   const [suppliers, setSuppliers] = useState([]);
@@ -169,39 +171,40 @@ const SupplierLedger = () => {
         </FormControl>
       </Box>
       {selectedSupplier && (
-        <Button
-          variant="contained"
-          sx={{ display: "block", mx: "auto", mt: 2 }}
-          onClick={async () => {
-            try {
-              const token = localStorage.getItem("token");
-              const res = await api.get("/transaction/exportTransactions", {
-                headers: {
-                  Authorization: `Bearer ${token}`, // ✅ fix template string
-                  "Content-Type": "application/json",
-                },
-                params: { supplierName: selectedSupplier },
-                responseType: "blob", // ✅ necessary to handle Excel file
-              });
+        <Tooltip title="ייצוא עסקאות ספק לאקסל" arrow>
+          <Button
+            variant="contained"
+            endIcon={<img src={ExcelIcon} alt="Excel" width="20" />}
+            sx={{ display: "block", mx: "auto", mt: 2 }}
+            onClick={async () => {
+              try {
+                const token = localStorage.getItem("token");
+                const res = await api.get("/transaction/exportSupplierTransactions", {
+                  headers: {
+                    Authorization: `Bearer ${token}`, // ✅ fix template string
+                    "Content-Type": "application/json",
+                  },
+                  params: { supplierName: selectedSupplier },
+                  responseType: "blob", // ✅ necessary to handle Excel file
+                });
 
-              const blob = new Blob([res.data], {
-                type: res.headers["content-type"],
-              });
+                const blob = new Blob([res.data], {
+                  type: res.headers["content-type"],
+                });
 
-              const url = window.URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `transactions_${selectedSupplier}.xlsx`; // ✅ fix filename string
-              document.body.appendChild(a);
-              a.click();
-              a.remove();
-            } catch (error) {
-              console.error("Export failed:", error);
-              alert("שגיאה בייצוא הקובץ");
-            }
-          }}>
-          ייצוא לאקסל
-        </Button>
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `transactions_${selectedSupplier}.xlsx`; // ✅ fix filename string
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+              } catch (error) {
+                console.error("Export failed:", error);
+                alert("שגיאה בייצוא הקובץ");
+              }
+            }}></Button>
+        </Tooltip>
       )}
       <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
         <Table>

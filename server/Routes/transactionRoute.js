@@ -43,6 +43,12 @@ router.post(
   transactionController.createTransaction
 );
 
-router.get("/exportTransactions", checkAuth, transactionController.exportTransactionsToExcel);
+router.get(
+  "/exportSupplierTransactions",
+  checkAuth,
+  transactionController.exportSupplierTransactionsToExcel
+);
+
+router.get("/exportAllTransactions", checkAuth, transactionController.exportAllTransactionsToExcel);
 
 export default router;
