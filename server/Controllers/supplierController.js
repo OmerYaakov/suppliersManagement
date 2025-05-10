@@ -179,13 +179,13 @@ const exportSuppliersToExcel = async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Suppliers");
     worksheet.columns = [
-      { header: "שם הספק", key: "supplierName", width: 30 },
-      { header: "כתובת", key: "addres", width: 30 },
-      { header: "טלפון", key: "phone", width: 15 },
-      { header: "איש קשר", key: "contactName", width: 20 },
-      { header: "טלפון איש קשר", key: "contactPhone", width: 20 },
-      { header: "יתרה", key: "sumAmount", width: 15 },
-      { header: "הערות", key: "notes", width: 30 },
+      { header: "שם הספק", key: "supplierName", width: 30, centered: true },
+      { header: "כתובת", key: "addres", width: 30, centered: true },
+      { header: "טלפון", key: "phone", width: 15, centered: true },
+      { header: "איש קשר", key: "contactName", width: 20, centered: true },
+      { header: "טלפון איש קשר", key: "contactPhone", width: 20, centered: true },
+      { header: "יתרה", key: "sumAmount", width: 15, centered: true },
+      { header: "הערות", key: "notes", width: 30, centered: true },
     ];
 
     suppliers.forEach((supplier) => {
@@ -198,7 +198,13 @@ const exportSuppliersToExcel = async (req, res) => {
         sumAmount: supplier.sumAmount,
         notes: supplier.notes,
       });
+      worksheet.eachRow((row, rowNumber) => {
+        row.eachCell((cell) => {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        });
+      });
     });
+
     res.setHeader(
       "Content-Type",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
