@@ -44,7 +44,7 @@ const SupplierBalances = () => {
 
   return (
     <>
-      <Tooltip title="ייצוא כל עסקאות הספקים לאקסל" arrow>
+      <Tooltip title="ייצוא יתרות ספקים לאקסל" arrow>
         <Button
           variant="contained"
           endIcon={<img src={ExcelIcon} alt="Excel" width="20" />}
@@ -52,7 +52,7 @@ const SupplierBalances = () => {
           hint
           onClick={async () => {
             try {
-              const res = await api.get("/transaction/exportAllTransactions", {
+              const res = await api.get("/supplier/exportSuppliersBalances", {
                 headers: {
                   Authorization: `Bearer ${token}`,
                   "Content-Type": "application/json",
@@ -67,7 +67,7 @@ const SupplierBalances = () => {
               const url = window.URL.createObjectURL(blob);
               const a = document.createElement("a");
               a.href = url;
-              a.download = "transactions.xlsx";
+              a.download = "suppliers_balances.xlsx";
               a.click();
             } catch (error) {
               console.error("Error downloading Excel file:", error);
