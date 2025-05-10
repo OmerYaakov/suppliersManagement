@@ -242,8 +242,9 @@ const exportSupplierTransactionsToExcel = async (req, res) => {
 
 const exportAllTransactionsToExcel = async (req, res) => {
   try {
+    const userId = req.user.userId; // Get userId from the decoded token
     const transactions = await transactionModel
-      .find()
+      .find({ createdBy: userId }) // Ensure the user is authenticated
       .sort({ supplierName: -1, transactionDate: -1 });
 
     const workbook = new ExcelJS.Workbook();
