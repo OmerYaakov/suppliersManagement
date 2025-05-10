@@ -1,5 +1,6 @@
 import supplierModel from "../Models/supplierModel.js";
 import mongoose from "mongoose"; // Import mongoose to validate ObjectId
+import ExcelJS from "exceljs"; // Import ExcelJS for Excel file generation
 
 const createSupplier = async (req, res) => {
   console.log("Creating supplier...");
@@ -166,6 +167,53 @@ const updateSupplier = async (req, res) => {
   }
 };
 
+const exportSuppliersToExcel = async (req, res) => {
+  try {
+    const userId = req.user.userId; // Get userId from the decoded token
+
+    const suppliers = await supplierModel.find({ createdBy: userId });
+    if (!suppliers || suppliers.length === 0) {
+      return res.status(404).json({ message: "No suppliers found for this user." });
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Suppliers");
+    worksheet.columns = [
+      { header: "שם הספק", key: "supplierName", width: 30 },
+      { header: "כתובת", key: "addres", width: 30 },
+      { header: "טלפון", key: "phone", width: 15 },
+      { header: "איש קשר", key: "contactName", width: 20 },
+      { header: "טלפון איש קשר", key: "contactPhone", width: 20 },
+      { header: "יתרה", key: "sumAmount", width: 15 },
+      { header: "הערות", key: "notes", width: 30 },
+    ];
+
+    suppliers.forEach((supplier) => {
+      worksheet.addRow({
+        supplierName: supplier.supplierName,
+        addres: supplier.addres,
+        phone: supplier.phone,
+        contactName: supplier.contactName,
+        contactPhone: supplier.contactPhone,
+        sumAmount: supplier.sumAmount,
+        notes: supplier.notes,
+      });
+    });
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    const encodedFileName = encodeURIComponent(`suppliers_all}.xlsx`);
+    res.setHeader("Content-Disposition", `attachment; filename*=UTF-8''${encodedFileName}`);
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error("Excel export error:", error);
+    res.status(500).json({ message: "שגיאה בייצוא לאקסל" });
+  }
+};
+
 export default {
   createSupplier,
   getAllSuppliers,
@@ -173,4 +221,5 @@ export default {
   updateSupplierAmount,
   getSumAmount,
   updateSupplier,
+  exportSuppliersToExcel,
 };
