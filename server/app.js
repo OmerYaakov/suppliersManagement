@@ -12,6 +12,7 @@ import { fileURLToPath } from "url";
 import userRoute from "./Routes/userRoute.js";
 import AWS from "aws-sdk";
 import path from "path";
+import dashboardRoute from "./Routes/dashboardRoute.js";
 
 dotenv.config();
 const app = express();
@@ -84,6 +85,7 @@ app.use("/api/supplier", supplierRoute);
 app.use("/api/receivers", receiversRout);
 app.use("/api/transactionCategory", transactionCategoryRoute);
 app.use("/api/transactionType", transactionTypeRoute);
+app.use("/api/admin", dashboardRoute);
 app.use("/api/public/uploads", express.static(path.join(__dirname, "public/uploads")));
 
 app.use("/api/user", userRoute);
