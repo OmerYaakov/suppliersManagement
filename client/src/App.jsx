@@ -10,6 +10,7 @@ import EditSupplier from "./pages.jsx/manageSuppliersPage/editSupplier";
 import Header from "../header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import SupplierBalances from "./pages.jsx/manageSuppliersPage/supplierBalances";
+import AdminDashboard from "./pages.jsx/adminDashboardPage/adminDashboard";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
@@ -22,6 +23,8 @@ function App() {
       <BrowserRouter>
         <Header />
         <Routes>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
           <Route path="/addTransaction" element={<AddTransaction />} />
           <Route path="/addSupplier" element={<AddSupplier />} />
           <Route path="/supplierLedger" element={<SupplierLedger />} />
