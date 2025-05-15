@@ -14,8 +14,9 @@ import AWS from "aws-sdk";
 import path from "path";
 import dashboardRoute from "./Routes/dashboardRoute.js";
 
-dotenv.config();
 const app = express();
+const envPath = process.env.NODE_ENV === "production" ? ".env.production" : ".env";
+dotenv.config({ path: envPath });
 if (process.env.NODE_ENV === "production") {
   console.log = function () {}; // Disable all console.log in production
 }
