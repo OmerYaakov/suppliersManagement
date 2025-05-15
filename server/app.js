@@ -72,8 +72,7 @@ app.options("*", cors()); // Enable pre-flight requests for all routes
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+
   next();
 });
 
