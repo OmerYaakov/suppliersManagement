@@ -30,6 +30,13 @@ const Header = () => {
           <span className="fs-4">מערכת לניהול ספקים</span>
 
           <a
+            href="/AddTransaction"
+            className={`nav-link-bordered ${
+              location.pathname === "/AddTransaction" ? "active" : ""
+            }`}>
+            הוספת עסקה
+          </a>
+          <a
             href="/AddSupplier"
             className={`nav-link-bordered ${location.pathname === "/AddSupplier" ? "active" : ""}`}>
             הוספת ספק
