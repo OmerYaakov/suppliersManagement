@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { TextField, Button, MenuItem, Select, InputLabel, FormControl, Box } from "@mui/material";
+import { TextField, Button, FormControl, Box, Snackbar, Alert as MuiAlert } from "@mui/material";
 import axios from "axios";
 
-const addSupplier = () => {
+const AddSupplier = () => {
   const [supplierName, setSupplierName] = useState("");
   const [addres, setAddres] = useState("");
   const [phone, setPhone] = useState("");
@@ -10,12 +10,23 @@ const addSupplier = () => {
   const [contactPhone, setContactPhone] = useState("");
   const [notes, setNotes] = useState("");
 
+  // Snackbar state
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("You are not logged in.");
+      setSnackbarMessage("You are not logged in.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
       return;
     }
 
@@ -29,16 +40,18 @@ const addSupplier = () => {
         notes,
       };
 
-      console.log("Creating supplier...");
       const res = await axios.post("/supplier/create", newSupplier, {
         headers: {
-          Authorization: `Bearer ${token}`, // Make sure the token is passed correctly
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      console.log("Supplier created successfully:", res.data);
+      // Show success snackbar
+      setSnackbarMessage("הספק נוסף בהצלחה");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
 
-      // Reset form fields after successful creation
+      // Reset form
       setSupplierName("");
       setAddres("");
       setPhone("");
@@ -46,15 +59,18 @@ const addSupplier = () => {
       setContactPhone("");
       setNotes("");
     } catch (error) {
+      let message = "קיימת שגיאה בהוספת הספק. אנא נסה שוב.";
       if (error.response?.status === 409) {
-        alert("קיים ספק עם אותו שם. אנא בחר שם אחר.");
+        message = "קיים ספק עם אותו שם. אנא בחר שם אחר.";
       } else if (error.response?.status === 401) {
-        alert("שגיאה בהתחברות. אנא התחבר שוב.");
+        message = "שגיאה בהתחברות. אנא התחבר שוב.";
       } else if (error.response?.status === 500) {
-        alert("שגיאה פנימית בשרת. אנא נסה שוב מאוחר יותר.");
-      } else {
-        alert("קיימת שגיאה בהוספת הספק. אנא נסה שוב.");
+        message = "שגיאה פנימית בשרת. אנא נסה שוב מאוחר יותר.";
       }
+
+      setSnackbarMessage(message);
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
       console.error("Error creating supplier:", error.response?.data || error.message);
     }
   };
@@ -63,18 +79,14 @@ const addSupplier = () => {
 
   const handleSupplierPhoneNumberChange = (event) => {
     const value = event.target.value;
-    // Allow only numbers and "+" at the start
-    const validValue = /^\+?\d*$/.test(value);
-    if (validValue || value === "") {
+    if (/^\+?\d*$/.test(value) || value === "") {
       setPhone(value);
     }
   };
 
   const handleContactPhoneNumberChange = (event) => {
     const value = event.target.value;
-    // Allow only numbers and "+" at the start
-    const validValue = /^\+?\d*$/.test(value);
-    if (validValue || value === "") {
+    if (/^\+?\d*$/.test(value) || value === "") {
       setContactPhone(value);
     }
   };
@@ -89,9 +101,7 @@ const addSupplier = () => {
               label="שם הספק"
               value={supplierName}
               onChange={handleInputChange(setSupplierName)}
-              fullWidth
               required
-              type="text"
             />
           </FormControl>
           <FormControl fullWidth margin="normal">
@@ -99,9 +109,7 @@ const addSupplier = () => {
               label="כתובת"
               value={addres}
               onChange={handleInputChange(setAddres)}
-              fullWidth
               required
-              type="text"
             />
           </FormControl>
           <FormControl fullWidth margin="normal">
@@ -109,7 +117,6 @@ const addSupplier = () => {
               label="טלפון"
               value={phone}
               onChange={handleSupplierPhoneNumberChange}
-              fullWidth
               required
               type="tel"
             />
@@ -119,35 +126,40 @@ const addSupplier = () => {
               label="איש קשר"
               value={contactName}
               onChange={handleInputChange(setContactName)}
-              fullWidth
-              type="text"
             />
           </FormControl>
           <FormControl fullWidth margin="normal">
             <TextField
-              label="טלפון איש קשר "
+              label="טלפון איש קשר"
               value={contactPhone}
               onChange={handleContactPhoneNumberChange}
-              fullWidth
-              type="text"
             />
           </FormControl>
           <FormControl fullWidth margin="normal">
-            <TextField
-              label="הערות "
-              value={notes}
-              onChange={handleInputChange(setNotes)}
-              fullWidth
-              type="text"
-            />
+            <TextField label="הערות" value={notes} onChange={handleInputChange(setNotes)} />
           </FormControl>
           <Button variant="contained" type="submit" fullWidth>
             אישור
           </Button>
         </form>
       </Box>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
+        <MuiAlert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+          elevation={6}
+          variant="filled">
+          {snackbarMessage}
+        </MuiAlert>
+      </Snackbar>
     </>
   );
 };
 
-export default addSupplier;
+export default AddSupplier;

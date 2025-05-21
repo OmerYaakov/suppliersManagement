@@ -1,0 +1,39 @@
+/* Generic nav link — white style */
+.nav-link-bordered {
+  transition: all 0.3s ease;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin: 0 5px;
+  color: #ffffff;
+  background-color: transparent;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Hover/active for regular links */
+.nav-link-bordered:hover,
+.nav-link-bordered.active {
+  border-color: #ffffff;
+  font-weight: bold;
+}
+
+/* Dashboard link — yellow style */
+.dashboard-link {
+  transition: all 0.3s ease;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin: 0 5px;
+  color: #ffc107;
+  background-color: transparent;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Hover/active for dashboard */
+.dashboard-link:hover,
+.dashboard-link.active {
+  border-color: #ffc107;
+  font-weight: bold;
+}

@@ -30,7 +30,11 @@ const loginWithGoogle = async (req, res) => {
     }
 
     // Generate your own JWT token for app authentication
-    const appToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "5h" });
+    const appToken = jwt.sign(
+      { userId: user._id, email: user.email }, // ✅ include email
+      process.env.JWT_SECRET,
+      { expiresIn: "5h" }
+    );
 
     // Return the token and user data
     res.status(200).json({

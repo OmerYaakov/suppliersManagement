@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Logout from "./src/components/logout";
+import Logout from "../logout";
+import { BorderAll } from "@mui/icons-material";
+import "../header/header.css";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -27,40 +29,41 @@ const Header = () => {
         <div className="d-flex flex-wrap align-items-center justify-content-between ">
           <span className="fs-4">מערכת לניהול ספקים</span>
 
-          <ul className="nav col-12 col-lg-auto mb-2 justify-content-center mb-md-0">
-            <li>
-              <a href="/AddTransaction" className="nav-link px-2 text-white">
-                הוספת עסקה
-              </a>
-            </li>
-            <li>
-              <a href="/AddSupplier" className="nav-link px-2 text-white">
-                הוספת ספק
-              </a>
-            </li>
-            <li>
-              <a href="/manageSuppliers" className="nav-link px-2 text-white">
-                ניהול ספקים
-              </a>
-            </li>
-            <li>
-              <a href="/supplierBalances" className="nav-link px-2 text-white">
-                יתרות ספקים
-              </a>
-            </li>
-            <li>
-              <a href="/SupplierLedger" className="nav-link px-2 text-white">
-                כרטסת ספקים
-              </a>
-            </li>
-            {isAdmin && (
-              <li>
-                <a href="/admin/dashboard" className="nav-link px-2 text-warning fw-bold">
-                  Dashboard
-                </a>
-              </li>
-            )}
-          </ul>
+          <a
+            href="/AddSupplier"
+            className={`nav-link-bordered ${location.pathname === "/AddSupplier" ? "active" : ""}`}>
+            הוספת ספק
+          </a>
+          <a
+            href="/manageSuppliers"
+            className={`nav-link-bordered ${
+              location.pathname === "/manageSuppliers" ? "active" : ""
+            }`}>
+            ניהול ספקים
+          </a>
+          <a
+            href="/supplierBalances"
+            className={`nav-link-bordered ${
+              location.pathname === "/supplierBalances" ? "active" : ""
+            }`}>
+            יתרות ספקים
+          </a>
+          <a
+            href="/SupplierLedger"
+            className={`nav-link-bordered ${
+              location.pathname === "/SupplierLedger" ? "active" : ""
+            }`}>
+            כרטסת ספקים
+          </a>
+          {isAdmin && (
+            <a
+              href="/admin/dashboard"
+              className={`dashboard-link ${
+                location.pathname === "/admin/dashboard" ? "active" : ""
+              }`}>
+              Dashboard
+            </a>
+          )}
 
           <div className="text-end">
             {!isLoggedIn ? (

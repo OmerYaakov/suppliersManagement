@@ -7,7 +7,7 @@ import TransactionPage from "./pages.jsx/transactionPage/transactionPage";
 import Login from "./pages.jsx/loginPage/login";
 import ManageSuppliers from "./pages.jsx/manageSuppliersPage/manageSuppliers";
 import EditSupplier from "./pages.jsx/manageSuppliersPage/editSupplier";
-import Header from "../header";
+import Header from "../src/components/header/header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import SupplierBalances from "./pages.jsx/manageSuppliersPage/supplierBalances";
 import AdminDashboard from "./pages.jsx/adminDashboardPage/adminDashboard";

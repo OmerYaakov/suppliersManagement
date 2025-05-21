@@ -4,7 +4,7 @@ export default function isAdmin(req, res, next) {
   console.log("🔐 ADMIN_EMAIL from env:", process.env.ADMIN_EMAIL);
   console.log("👤 Email from token:", req.user?.email);
 
-  if (req.user?.email === process.env.ADMIN_EMAIL) {
+  if (req.user?.email === "omeryaakov2@gmail.com") {
     console.log("✅ Admin verified, proceeding...");
     return next();
   }
