@@ -23,6 +23,8 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 
+const HiddenInput = styled("input")({ display: "none" });
+
 const AddTransaction = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState("");
@@ -37,9 +39,16 @@ const AddTransaction = () => {
   const [selectedTransactionCategory, setSelectedTransactionCategory] = useState("");
   const [notes, setNotes] = useState("");
   const [files, setFiles] = useState([]);
-  const HiddenInput = styled("input")({ display: "none" });
 
-  // Snackbar state
+  const [newType, setNewType] = useState("");
+  const [openAddTypeDialog, setOpenAddTypeDialog] = useState(false);
+
+  const [newCategory, setNewCategory] = useState("");
+  const [openAddCategoryDialog, setOpenAddCategoryDialog] = useState(false);
+
+  const [newReceiver, setNewReceiver] = useState("");
+  const [openAddReceiverDialog, setOpenAddReceiverDialog] = useState(false);
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -95,7 +104,7 @@ const AddTransaction = () => {
     }
   };
 
-  const handleInputChange = (setter) => (event) => setter(event.target.value);
+  const handleInputChange = (setter) => (e) => setter(e.target.value);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -114,24 +123,15 @@ const AddTransaction = () => {
       files.forEach((file) => formData.append("file", file));
 
       if (files.length > 10) {
-        setSnackbarMessage("אפשר להעלות עד 10 קבצים.");
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
-        return;
+        return showSnackbar("אפשר להעלות עד 10 קבצים.", "error");
       }
 
       if (selectedTransactionType === "זיכוי" && !transactionAmount.startsWith("-")) {
-        setSnackbarMessage("אם בחרת זיכוי הסכום חייב להיות במינוס (לדוגמה: -100)");
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
-        return;
+        return showSnackbar("אם בחרת זיכוי הסכום חייב להיות במינוס (לדוגמה: -100)", "error");
       }
 
       if (Number(transactionNumber) === 0 && selectedTransactionType !== "קבלה") {
-        setSnackbarMessage("רק עסקה מסוג קבלה יכולה להכיל מספר עסקה 0");
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
-        return;
+        return showSnackbar("רק עסקה מסוג קבלה יכולה להכיל מספר עסקה 0", "error");
       }
 
       await axios.post("./transaction/create", formData, {
@@ -139,70 +139,66 @@ const AddTransaction = () => {
       });
 
       await updateSupplierAmount(selectedSupplier, transactionAmount, selectedTransactionType);
-
-      // Success Snackbar
-      setSnackbarMessage("העסקה נוספה בהצלחה");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
-
-      // Reset form
-      setSelectedSupplier("");
-      setSelectedTransactionType("");
-      setTransactionNumber("");
-      setTransactionAmount("");
-      setTransactionDate("");
-      setSelectedReceiver("");
-      setSelectedTransactionCategory("");
-      setNotes("");
-      setFiles([]);
+      resetForm();
+      showSnackbar("העסקה נוספה בהצלחה", "success");
     } catch (error) {
       if (error.response?.status === 409) {
-        setSnackbarMessage("קיימת עסקה עם אותו מספר.");
+        showSnackbar("קיימת עסקה עם אותו מספר.", "error");
       } else {
-        setSnackbarMessage("שגיאה בהוספת העסקה");
+        showSnackbar("שגיאה בהוספת העסקה", "error");
       }
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
     }
   };
 
-  const updateSupplierAmount = async (selectedSupplier, transactionAmount, transactionType) => {
+  const resetForm = () => {
+    setSelectedSupplier("");
+    setSelectedTransactionType("");
+    setTransactionNumber("");
+    setTransactionAmount("");
+    setTransactionDate("");
+    setSelectedReceiver("");
+    setSelectedTransactionCategory("");
+    setNotes("");
+    setFiles([]);
+  };
+
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  const updateSupplierAmount = async (supplierName, amount, type) => {
     try {
-      const { data: supplierData } = await axios.get("/supplier/getSupplierAmount/", {
-        params: { supplierName: selectedSupplier },
+      const { data } = await axios.get("/supplier/getSupplierAmount/", {
+        params: { supplierName },
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
-      const currentAmount = supplierData?.sumAmount || 0;
-      let newAmount;
-
-      if (transactionType === "קבלה") {
-        newAmount = parseFloat(currentAmount) - parseFloat(transactionAmount);
-      } else if (transactionType === "חשבונית-קבלה") {
-        newAmount = parseFloat(currentAmount);
-      } else {
-        newAmount = parseFloat(currentAmount) + parseFloat(transactionAmount);
-      }
+      const current = data?.sumAmount || 0;
+      let newAmount =
+        type === "קבלה"
+          ? current - amount
+          : type === "חשבונית-קבלה"
+          ? current
+          : current + parseFloat(amount);
 
       await axios.post(
         "/supplier/updateAmount",
         {
-          filter: { supplierName: selectedSupplier },
+          filter: { supplierName },
           update: { $set: { sumAmount: newAmount } },
         },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
     } catch (error) {
-      console.error("Error updating supplier amount:", error.response?.data || error.message);
+      console.error("Error updating supplier amount:", error);
     }
   };
 
-  const handleTransactionAmountChange = (event) => {
-    const value = event.target.value;
-    const formattedValue = value.match(/^-?\d*(\.\d{0,2})?$/) ? value : transactionAmount;
-    setTransactionAmount(formattedValue);
+  const handleTransactionAmountChange = (e) => {
+    const value = e.target.value;
+    if (/^-?\d*(\.\d{0,2})?$/.test(value)) setTransactionAmount(value);
   };
 
   const handleTransactionAmountBlur = () => {
@@ -211,17 +207,58 @@ const AddTransaction = () => {
     }
   };
 
-  const handleFileChange = (event) => {
-    const files = Array.from(event.target.files);
-    setFiles((prevFiles) => [...prevFiles, ...files]);
+  const handleFileChange = (e) => setFiles([...files, ...Array.from(e.target.files)]);
+  const handleDeleteFile = (i) => setFiles((prev) => prev.filter((_, idx) => idx !== i));
+  const handleSnackbarClose = () => setSnackbarOpen(false);
+
+  const handleAddItem = async (endpoint, value, setList, setSelected, setDialog, resetInput) => {
+    try {
+      const res = await axios.post(endpoint, value, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setList((prev) => [...prev, res.data]);
+      setSelected(Object.values(res.data)[1]); // e.g., receiverName or categoryName
+      resetInput("");
+      setDialog(false);
+    } catch (error) {
+      console.error("Add error:", error);
+    }
   };
 
-  const handleDeleteFile = (indexToDelete) => {
-    setFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToDelete));
+  const handleRemoveType = async (id, name) => {
+    try {
+      await axios.delete(`/transactionType/delete/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setTransactionTypes((prev) => prev.filter((t) => t._id !== id));
+      if (selectedTransactionType === name) setSelectedTransactionType("");
+    } catch (error) {
+      console.error("שגיאה במחיקת סוג עסקה:", error);
+    }
   };
 
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
+  const handleRemoveCategory = async (id, name) => {
+    try {
+      await axios.delete(`/transactionCategory/delete/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setTransactionCategories((prev) => prev.filter((c) => c._id !== id));
+      if (selectedTransactionCategory === name) setSelectedTransactionCategory("");
+    } catch (error) {
+      console.error("שגיאה במחיקת קטגוריה:", error);
+    }
+  };
+
+  const handleRemoveReceiver = async (id, name) => {
+    try {
+      await axios.delete(`/receivers/delete/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setReceivers((prev) => prev.filter((r) => r._id !== id));
+      if (selectedReceiver === name) setSelectedReceiver("");
+    } catch (error) {
+      console.error("שגיאה במחיקת מקבל:", error);
+    }
   };
 
   return (
@@ -237,9 +274,9 @@ const AddTransaction = () => {
             <MenuItem value="" disabled>
               בחר ספק
             </MenuItem>
-            {suppliers.map((supplier, index) => (
-              <MenuItem key={index} value={supplier.supplierName}>
-                {supplier.supplierName}
+            {suppliers.map((s) => (
+              <MenuItem key={s._id} value={s.supplierName}>
+                {s.supplierName}
               </MenuItem>
             ))}
           </Select>
@@ -249,16 +286,33 @@ const AddTransaction = () => {
           <InputLabel>סוג עסקה</InputLabel>
           <Select
             value={selectedTransactionType}
-            onChange={handleInputChange(setSelectedTransactionType)}
+            onChange={(e) =>
+              e.target.value === "add"
+                ? setOpenAddTypeDialog(true)
+                : setSelectedTransactionType(e.target.value)
+            }
             required>
             <MenuItem value="" disabled>
-              בחר סוג עסקה
+              בחר סוג
             </MenuItem>
             {transactionTypes.map((type) => (
               <MenuItem key={type._id} value={type.typeName}>
-                {type.typeName}
+                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                  <ListItemText primary={type.typeName} />
+                  {selectedTransactionType !== type.typeName && (
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveType(type._id, type.typeName);
+                      }}>
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </Box>
               </MenuItem>
             ))}
+            <MenuItem value="add">+ הוסף סוג עסקה חדש</MenuItem>
           </Select>
         </FormControl>
 
@@ -270,9 +324,8 @@ const AddTransaction = () => {
           margin="normal"
           type="number"
         />
-
         <TextField
-          label="סכום העסקה בשקלים"
+          label="סכום העסקה"
           value={transactionAmount}
           onChange={handleTransactionAmountChange}
           onBlur={handleTransactionAmountBlur}
@@ -280,7 +333,6 @@ const AddTransaction = () => {
           margin="normal"
           type="text"
         />
-
         <TextField
           label="תאריך העסקה"
           value={transactionDate}
@@ -295,16 +347,34 @@ const AddTransaction = () => {
           <InputLabel>מקבל העסקה</InputLabel>
           <Select
             value={selectedReceiver}
-            onChange={handleInputChange(setSelectedReceiver)}
+            onChange={(e) =>
+              e.target.value === "add"
+                ? setOpenAddReceiverDialog(true)
+                : setSelectedReceiver(e.target.value)
+            }
             required>
             <MenuItem value="" disabled>
-              בחר מקבל העסקה
+              בחר מקבל
             </MenuItem>
             {receiversTransaction.map((receiver) => (
               <MenuItem key={receiver._id} value={receiver.receiverName}>
-                {receiver.receiverName}
+                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                  <ListItemText primary={receiver.receiverName} />
+                  {selectedReceiver !== receiver.receiverName && (
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveReceiver(receiver._id, receiver.receiverName);
+                      }}>
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </Box>
               </MenuItem>
             ))}
+
+            <MenuItem value="add">+ הוסף מקבל חדש</MenuItem>
           </Select>
         </FormControl>
 
@@ -312,16 +382,34 @@ const AddTransaction = () => {
           <InputLabel>קטגוריה</InputLabel>
           <Select
             value={selectedTransactionCategory}
-            onChange={handleInputChange(setSelectedTransactionCategory)}
+            onChange={(e) =>
+              e.target.value === "add"
+                ? setOpenAddCategoryDialog(true)
+                : setSelectedTransactionCategory(e.target.value)
+            }
             required>
             <MenuItem value="" disabled>
               בחר קטגוריה
             </MenuItem>
             {transactionCategories.map((cat) => (
               <MenuItem key={cat._id} value={cat.categoryName}>
-                {cat.categoryName}
+                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                  <ListItemText primary={cat.categoryName} />
+                  {selectedTransactionCategory !== cat.categoryName && (
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveCategory(cat._id, cat.categoryName);
+                      }}>
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </Box>
               </MenuItem>
             ))}
+
+            <MenuItem value="add">+ הוסף קטגוריה חדשה</MenuItem>
           </Select>
         </FormControl>
 
@@ -340,27 +428,17 @@ const AddTransaction = () => {
             העלה קבצים
             <HiddenInput type="file" multiple onChange={handleFileChange} />
           </Button>
-
           <List sx={{ marginTop: 2, maxHeight: 200, overflowY: "auto" }}>
-            {files.length > 0 ? (
-              files.map((file, index) => (
-                <ListItem key={index}>
-                  <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <Typography variant="body2">{file.name}</Typography>
-                    <IconButton
-                      onClick={() => handleDeleteFile(index)}
-                      size="small"
-                      sx={{ mr: "auto" }}>
-                      <CloseIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                </ListItem>
-              ))
-            ) : (
-              <Typography variant="body1" sx={{ marginTop: 2 }}>
-                לא נבחרו קבצים
-              </Typography>
-            )}
+            {files.map((file, i) => (
+              <ListItem key={i}>
+                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                  <Typography variant="body2">{file.name}</Typography>
+                  <IconButton onClick={() => handleDeleteFile(i)} size="small" sx={{ mr: "auto" }}>
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              </ListItem>
+            ))}
           </List>
         </Box>
 
@@ -368,6 +446,79 @@ const AddTransaction = () => {
           שמור
         </Button>
       </form>
+
+      {/* דיאלוגים */}
+      <Dialog open={openAddTypeDialog} onClose={() => setOpenAddTypeDialog(false)}>
+        <DialogTitle>הוסף סוג עסקה</DialogTitle>
+        <DialogContent>
+          <TextField value={newType} onChange={handleInputChange(setNewType)} fullWidth />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAddTypeDialog(false)}>ביטול</Button>
+          <Button
+            onClick={() =>
+              handleAddItem(
+                "/transactionType/create",
+                { typeName: newType },
+                setTransactionTypes,
+                setSelectedTransactionType,
+                setOpenAddTypeDialog,
+                setNewType
+              )
+            }
+            variant="contained">
+            הוסף
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openAddCategoryDialog} onClose={() => setOpenAddCategoryDialog(false)}>
+        <DialogTitle>הוסף קטגוריה</DialogTitle>
+        <DialogContent>
+          <TextField value={newCategory} onChange={handleInputChange(setNewCategory)} fullWidth />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAddCategoryDialog(false)}>ביטול</Button>
+          <Button
+            onClick={() =>
+              handleAddItem(
+                "/transactionCategory/create",
+                { categoryName: newCategory },
+                setTransactionCategories,
+                setSelectedTransactionCategory,
+                setOpenAddCategoryDialog,
+                setNewCategory
+              )
+            }
+            variant="contained">
+            הוסף
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openAddReceiverDialog} onClose={() => setOpenAddReceiverDialog(false)}>
+        <DialogTitle>הוסף מקבל</DialogTitle>
+        <DialogContent>
+          <TextField value={newReceiver} onChange={handleInputChange(setNewReceiver)} fullWidth />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAddReceiverDialog(false)}>ביטול</Button>
+          <Button
+            onClick={() =>
+              handleAddItem(
+                "/receivers/create",
+                { receiverName: newReceiver },
+                setReceivers,
+                setSelectedReceiver,
+                setOpenAddReceiverDialog,
+                setNewReceiver
+              )
+            }
+            variant="contained">
+            הוסף
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Snackbar */}
       <Snackbar
