@@ -1,10 +1,10 @@
 services:
   client:
-    build: ./client
-    ports:
-      - "5173:5173"
-    depends_on:
-      - server
+    build:
+      context: ./client
+      dockerfile: dockerfile
+    volumes:
+      - ./client/dist:/app/dist
     networks:
       - my-network
 
