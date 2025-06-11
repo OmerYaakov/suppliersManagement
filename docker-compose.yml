@@ -1,22 +1,24 @@
-version: "3.8"
 services:
-  shagalphoto-backend:
+  client:
+    build:
+      context: ./client
+      dockerfile: dockerfile
+    volumes:
+      - ./client/dist:/app/dist
+    networks:
+      - my-network
+
+  server:
     build: ./server
+    env_file:
+      - ./server/.env.production
     ports:
-      - "5001:5001"
-    restart: always
+      - "5000:5000"
     environment:
-      - MONGO_URL=mongodb+srv://omeryaakov2:F59a7b4fa4@shagalphoto.v3genik.mongodb.net/?retryWrites=true&w=majority&appName=shagalphoto
-    depends_on:
-      - mongo
+      - NODE_ENV=production
+    networks:
+      - my-network
 
-  shagalphoto-frontend:
-    build: ./client
-    ports:
-      - "3001:3000"
-    restart: always
-
-  mongo:
-    image: mongo
-    ports:
-      - "27017:27017"
+networks:
+  my-network:
+    driver: bridge
