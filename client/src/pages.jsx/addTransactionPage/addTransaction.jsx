@@ -108,6 +108,7 @@ const AddTransaction = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("🚨 handleSubmit triggered");
     const formData = new FormData();
 
     try {
@@ -139,7 +140,7 @@ const AddTransaction = () => {
         console.log("🔹", pair[0], pair[1]);
       }
 
-      await axios.post("./transaction/create", formData, {
+      await axios.post("/transaction/create", formData, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
@@ -277,7 +278,11 @@ const AddTransaction = () => {
   return (
     <Box sx={{ maxWidth: 600, margin: "0 auto", padding: 3 }}>
       <h1>הוספת עסקה חדשה</h1>
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(e);
+        }}>
         <FormControl fullWidth margin="normal">
           <InputLabel>ספק</InputLabel>
           <Select
@@ -455,7 +460,12 @@ const AddTransaction = () => {
           </List>
         </Box>
 
-        <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          sx={{ mt: 2 }}
+          onClick={() => console.log("🖱️ Save button clicked")}>
           שמור
         </Button>
       </form>
