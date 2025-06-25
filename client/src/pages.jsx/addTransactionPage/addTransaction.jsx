@@ -145,6 +145,14 @@ const AddTransaction = () => {
       if (error.response?.status === 409) {
         showSnackbar("קיימת עסקה עם אותו מספר.", "error");
       } else {
+        console.error("❌ Upload failed:", error);
+        if (error.response) {
+          console.error("Server responded with:", error.response.status, error.response.data);
+        } else if (error.request) {
+          console.error("No response received. Request was:", error.request);
+        } else {
+          console.error("Error setting up request:", error.message);
+        }
         showSnackbar("שגיאה בהוספת העסקה", "error");
       }
     }
