@@ -67,8 +67,12 @@ const createTransaction = async (req, res) => {
         safeFilename = safeFilename.replace(/\.heic/i, ".jpg");
       }
 
+      const bucketName = process.env.AWS_BUCKET_NAME;
+      if (!bucketName) {
+        throw new Error("AWS_BUCKET_NAME is missing in environment variables.");
+      }
       const params = {
-        Bucket: process.env.AWS_BUCKET_NAME,
+        Bucket: bucketName,
         Key: safeFilename,
         Body: buffer,
         ContentType: contentType,
