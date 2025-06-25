@@ -134,6 +134,11 @@ const AddTransaction = () => {
         return showSnackbar("רק עסקה מסוג קבלה יכולה להכיל מספר עסקה 0", "error");
       }
 
+      console.log("📤 Submitting transaction...");
+      for (let pair of formData.entries()) {
+        console.log("🔹", pair[0], pair[1]);
+      }
+
       await axios.post("./transaction/create", formData, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
