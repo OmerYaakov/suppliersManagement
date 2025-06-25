@@ -26,14 +26,12 @@ router.patch(
   transactionController.updateTransactionNumber
 );
 
-router.post("/create", checkAuth, upload.any, transactionController.createTransaction);
+router.post("/create", checkAuth, upload.any(), transactionController.createTransaction);
 
 router.get(
   "/exportSupplierTransactions",
   checkAuth,
   transactionController.exportSupplierTransactionsToExcel
-  upload.any(), // ✅ Accepts any files under any field name
-  transactionController.createTransaction
 );
 
 router.get("/exportAllTransactions", checkAuth, transactionController.exportAllTransactionsToExcel);
