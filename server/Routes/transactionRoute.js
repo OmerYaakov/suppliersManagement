@@ -36,12 +36,7 @@ router.patch(
   transactionController.updateTransactionNumber
 );
 
-router.post(
-  "/create",
-  checkAuth,
-  upload.array("file", 10),
-  transactionController.createTransaction
-);
+router.post("/create", checkAuth, upload.any, transactionController.createTransaction);
 
 router.get(
   "/exportSupplierTransactions",
