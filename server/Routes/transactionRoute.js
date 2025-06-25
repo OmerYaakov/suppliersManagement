@@ -6,42 +6,37 @@ import checkAuth from "../middlewares/auth.js";
 
 const router = new Router();
 
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     return cb(null, path.resolve(process.cwd(), "./public/uploads"));
-//   },
-//   filename: (req, file, cb) => {
-//     return cb(null, file.originalname);
-//   },
-// });
-
+// Using memoryStorage for buffer-based upload (good for AWS S3, etc.)
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max per file
 });
 
+// GET routes
 router.get("/get", checkAuth, transactionController.getAllTransactions);
-
 router.get("/getBySupplier", checkAuth, transactionController.getBySupplier);
-
 router.get("/get/:_id", checkAuth, transactionController.getById);
-
 router.get("/get/date/:date", checkAuth, transactionController.getByDate);
 
-//update transaction number
+// PATCH: Update transaction number
 router.patch(
   "/updateTransactionNumber/:_id",
   checkAuth,
   transactionController.updateTransactionNumber
 );
 
-router.post(
-  "/create",
+router.post("/create", checkAuth, upload.any, transactionController.createTransaction);
+
+router.get(
+  "/exportSupplierTransactions",
   checkAuth,
+  transactionController.exportSupplierTransactionsToExcel
   upload.any(), // ✅ Accepts any files under any field name
   transactionController.createTransaction
 );
+
+router.get("/exportAllTransactions", checkAuth, transactionController.exportAllTransactionsToExcel);
 
 router.get(
   "/exportSupplierTransactions",
