@@ -28,7 +28,7 @@ const createTransaction = async (req, res) => {
   try {
     let existingTransaction = false;
     const userId = req.user.userId;
-    // Check if the user is authenticated
+
     if (!(Number(transactionNumber) === 0 && transactionType === "קבלה")) {
       existingTransaction = await transactionModel.findOne({
         createdBy: userId,
@@ -48,22 +48,7 @@ const createTransaction = async (req, res) => {
       return res.status(400).json({ message: "You can attach up to 10 images only." });
     }
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/heic"];
-    for (let file of req.files) {
-      if (!allowedTypes.includes(file.mimetype)) {
-        return res.status(400).json({ message: `Unsupported file type: ${file.mimetype}` });
-      }
-    }
-
-    // ✅ Validate image extensions
-    const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".heic"];
-    for (let file of req.files) {
-      const ext = path.extname(file.originalname).toLowerCase();
-      if (!validExtensions.includes(ext)) {
-        return res.status(400).json({ message: `Unsupported file type: ${ext}` });
-      }
-    }
-
+    // ✅ Only validate HEIC/HEIF for conversion
     const uploadPromises = req.files.map(async (file) => {
       let buffer = file.buffer;
       let extension = path.extname(file.originalname).toLowerCase();
