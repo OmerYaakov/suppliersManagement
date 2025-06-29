@@ -1,7 +1,7 @@
-node_modules
-.env
-*.env
-.env.*
-client/.env*
-server/.env*
 
+
+# Ignore local env files
+.env
+.env.*
+client/.env
+server/.env
