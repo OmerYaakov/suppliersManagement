@@ -14,13 +14,13 @@ const upload = multer({
 });
 
 // GET routes
-router.get("/get", checkAuth, transactionController.getAllTransactions);
-router.get("/getBySupplier", checkAuth, transactionController.getBySupplier);
 router.get(
   "/getByNumber/:transactionNumber",
   checkAuth,
   transactionController.getByTransactionNumber
 );
+router.get("/get", checkAuth, transactionController.getAllTransactions);
+router.get("/getBySupplier", checkAuth, transactionController.getBySupplier);
 
 // PATCH: Update transaction number
 router.patch(
