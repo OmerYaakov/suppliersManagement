@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
+import api from "../../api.js";
 
 const HiddenInput = styled("input")({ display: "none" });
 
@@ -44,7 +45,7 @@ const AddTransaction = () => {
 
   const fetchData = async (endpoint, setter) => {
     try {
-      const res = await axios.get(endpoint, {
+      const res = await api.get(endpoint, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setter(Array.isArray(res.data) ? res.data : []);
