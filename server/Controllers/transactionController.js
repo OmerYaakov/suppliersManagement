@@ -48,7 +48,12 @@ const createTransaction = async (req, res) => {
       return res.status(400).json({ message: "You can attach up to 10 images only." });
     }
 
-    // ✅ Only validate HEIC/HEIF for conversion
+    const uploadWithTimeout = (params) => {
+      return Promise.race([
+        s3.upload(params).promise(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("S3 upload timeout")), 10000)),
+      ]);
+    };
     const uploadPromises = req.files.map(async (file) => {
       let buffer = file.buffer;
       let extension = path.extname(file.originalname).toLowerCase();
@@ -78,7 +83,7 @@ const createTransaction = async (req, res) => {
         ContentType: contentType,
       };
 
-      return s3.upload(params).promise();
+      return uploadWithTimeout(params);
     });
 
     const uploadedFiles = await Promise.all(uploadPromises);
