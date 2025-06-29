@@ -16,8 +16,11 @@ const upload = multer({
 // GET routes
 router.get("/get", checkAuth, transactionController.getAllTransactions);
 router.get("/getBySupplier", checkAuth, transactionController.getBySupplier);
-router.get("/get/:_id", checkAuth, transactionController.getById);
-router.get("/get/date/:date", checkAuth, transactionController.getByDate);
+router.get(
+  "/getByNumber/:transactionNumber",
+  checkAuth,
+  transactionController.getByTransactionNumber
+);
 
 // PATCH: Update transaction number
 router.patch(
@@ -44,4 +47,13 @@ router.get(
 
 router.get("/exportAllTransactions", checkAuth, transactionController.exportAllTransactionsToExcel);
 
+router.patch(
+  "/updateFiles/:id",
+  checkAuth,
+  upload.any(),
+  transactionController.updateTransactionFiles
+);
+
+router.get("/get/:_id", checkAuth, transactionController.getById);
+router.get("/get/date/:date", checkAuth, transactionController.getByDate);
 export default router;

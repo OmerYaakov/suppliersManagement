@@ -114,6 +114,82 @@ const createTransaction = async (req, res) => {
   }
 };
 
+export const updateTransactionFiles = async (req, res) => {
+  try {
+    const transactionId = req.params.id;
+    const { remainingFiles } = req.body; // Array of file names to keep
+
+    const transaction = await transactionModel.findById(transactionId);
+    if (!transaction) {
+      return res.status(404).json({ message: "Transaction not found" });
+    }
+
+    // 1. Remove unwanted files from S3
+    const filesToDelete = transaction.files.filter((f) => !remainingFiles.includes(f.name));
+
+    const deleteParams = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Delete: {
+        Objects: filesToDelete.map((file) => ({ Key: file.name })),
+        Quiet: true,
+      },
+    };
+
+    if (deleteParams.Delete.Objects.length > 0) {
+      await s3.deleteObjects(deleteParams).promise();
+    }
+
+    // 2. Upload new files (if any)
+    const uploadPromises = (req.files || []).map(async (file) => {
+      let buffer = file.buffer;
+      let extension = path.extname(file.originalname).toLowerCase();
+      let contentType = file.mimetype;
+      let safeFilename = `${Date.now()}-${file.originalname.replace(/\s+/g, "_")}`;
+
+      if (file.mimetype === "image/heic" || extension === ".heic") {
+        buffer = await heicConvert({
+          buffer: file.buffer,
+          format: "JPEG",
+          quality: 1,
+        });
+        extension = ".jpg";
+        contentType = "image/jpeg";
+        safeFilename = safeFilename.replace(/\.heic/i, ".jpg");
+      }
+
+      const uploadParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: safeFilename,
+        Body: buffer,
+        ContentType: contentType,
+      };
+
+      const uploaded = await s3.upload(uploadParams).promise();
+      return {
+        name: uploaded.Key,
+        url: uploaded.Location,
+        size: uploaded.ContentLength || 0,
+      };
+    });
+
+    const newFiles = await Promise.all(uploadPromises);
+
+    // 3. Update the transaction document
+    const updatedTransaction = await transactionModel.findByIdAndUpdate(
+      transactionId,
+      {
+        files: [...transaction.files.filter((f) => remainingFiles.includes(f.name)), ...newFiles],
+      },
+      { new: true }
+    );
+
+    res.status(200).json(updatedTransaction);
+  } catch (err) {
+    console.error("❌ updateTransactionFiles:", err.message);
+    res.status(500).json({ message: "Failed to update files" });
+  }
+};
+
 const getBySupplier = async (req, res) => {
   try {
     console.log("getting by supplier...");
@@ -297,6 +373,27 @@ const exportAllTransactionsToExcel = async (req, res) => {
   }
 };
 
+export const getByTransactionNumber = async (req, res) => {
+  try {
+    const transactionNumber = req.params.transactionNumber;
+    const userId = req.user.userId;
+
+    const transaction = await transactionModel.findOne({
+      transactionNumber,
+      createdBy: userId,
+    });
+
+    if (!transaction) {
+      return res.status(404).json({ message: "Transaction not found" });
+    }
+
+    res.status(200).json(transaction);
+  } catch (error) {
+    console.error("❌ getByTransactionNumber error:", error);
+    res.status(500).json({ message: "Failed to fetch transaction" });
+  }
+};
+
 const getById = async (req, res) => {};
 
 const getByDate = async (req, res) => {};
@@ -310,4 +407,6 @@ export default {
   updateTransactionNumber,
   exportSupplierTransactionsToExcel,
   exportAllTransactionsToExcel,
+  updateTransactionFiles,
+  getByTransactionNumber,
 };
